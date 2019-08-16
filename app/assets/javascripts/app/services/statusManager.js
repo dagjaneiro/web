@@ -1,12 +1,13 @@
-class StatusManager {
+import _ from 'lodash';
 
+export class StatusManager {
   constructor() {
     this.statuses = [];
     this.observers = [];
   }
 
   statusFromString(string) {
-    return {string: string};
+    return { string: string };
   }
 
   replaceStatusWithString(status, string) {
@@ -19,8 +20,8 @@ class StatusManager {
   }
 
   addStatus(status) {
-    if(typeof status !== "object") {
-      console.error("Attempting to set non-object status", status);
+    if (typeof status !== 'object') {
+      console.error('Attempting to set non-object status', status);
       return;
     }
 
@@ -36,19 +37,19 @@ class StatusManager {
   }
 
   getStatusString() {
-    let result = "";
+    let result = '';
     this.statuses.forEach((status, index) => {
-      if(index > 0) {
-        result += "  ";
+      if (index > 0) {
+        result += '  ';
       }
       result += status.string;
-    })
+    });
 
     return result;
   }
 
   notifyObservers() {
-    for(let observer of this.observers) {
+    for (const observer of this.observers) {
       observer(this.getStatusString());
     }
   }
@@ -60,8 +61,4 @@ class StatusManager {
   removeStatusObserver(callback) {
     _.pull(this.statuses, callback);
   }
-
-
 }
-
-angular.module('app').service('statusManager', StatusManager);

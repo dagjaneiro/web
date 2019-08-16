@@ -35,7 +35,7 @@
     </script>
 
     <% if Rails.env.development? %>
-      <%= javascript_include_tag "compiled.js", debug: true %>
+      <%= javascript_include_tag "app.js", debug: true %>
     <% else %>
       <%= javascript_include_tag "compiled.min.js", debug: false %>
     <% end %>

@@ -1,4 +1,6 @@
-class MemoryStorage {
+import { SNEncryptedStorage } from 'snjs';
+
+export class MemoryStorage {
   constructor() {
     this.memory = {};
   }
@@ -36,19 +38,18 @@ class MemoryStorage {
   }
 }
 
-class StorageManager extends SFStorageManager {
-
+export class StorageManager extends SFStorageManager {
   constructor(dbManager) {
     super();
     this.dbManager = dbManager;
   }
 
   initialize(hasPasscode, ephemeral) {
-    if(hasPasscode) {
+    if (hasPasscode) {
       // We don't want to save anything in fixed storage except for actual item data (in IndexedDB)
       this.storage = this.memoryStorage;
       this.itemsStorageMode = StorageManager.FixedEncrypted;
-    } else if(ephemeral) {
+    } else if (ephemeral) {
       // We don't want to save anything in fixed storage as well as IndexedDB
       this.storage = this.memoryStorage;
       this.itemsStorageMode = StorageManager.Ephemeral;
@@ -57,11 +58,13 @@ class StorageManager extends SFStorageManager {
       this.itemsStorageMode = StorageManager.Fixed;
     }
 
-    this.modelStorageMode = ephemeral ? StorageManager.Ephemeral : StorageManager.Fixed;
+    this.modelStorageMode = ephemeral
+      ? StorageManager.Ephemeral
+      : StorageManager.Fixed;
   }
 
   get memoryStorage() {
-    if(!this._memoryStorage) {
+    if (!this._memoryStorage) {
       this._memoryStorage = new MemoryStorage();
     }
     return this._memoryStorage;
@@ -69,33 +72,40 @@ class StorageManager extends SFStorageManager {
 
   setItemsMode(mode, force) {
     var newStorage = this.getVault(mode);
-    if(newStorage !== this.storage || mode !== this.itemsStorageMode || force) {
+    if (
+      newStorage !== this.storage ||
+      mode !== this.itemsStorageMode ||
+      force
+    ) {
       // transfer storages
       var length = this.storage.length;
-      for(var i = 0; i < length; i++) {
+      for (var i = 0; i < length; i++) {
         var key = this.storage.key(i);
         newStorage.setItem(key, this.storage.getItem(key));
       }
 
       this.itemsStorageMode = mode;
-      if(newStorage !== this.storage) {
+      if (newStorage !== this.storage) {
         // Only clear if this.storage isn't the same reference as newStorage
         this.storage.clear();
       }
       this.storage = newStorage;
 
-      if(mode == StorageManager.FixedEncrypted) {
+      if (mode == StorageManager.FixedEncrypted) {
         this.writeEncryptedStorageToDisk();
-      } else if(mode == StorageManager.Fixed) {
+      } else if (mode == StorageManager.Fixed) {
         // Remove encrypted storage
-        this.removeItem("encryptedStorage", StorageManager.Fixed);
+        this.removeItem('encryptedStorage', StorageManager.Fixed);
       }
     }
   }
 
   getVault(vaultKey) {
-    if(vaultKey) {
-      if(vaultKey == StorageManager.Ephemeral || vaultKey == StorageManager.FixedEncrypted) {
+    if (vaultKey) {
+      if (
+        vaultKey == StorageManager.Ephemeral ||
+        vaultKey == StorageManager.FixedEncrypted
+      ) {
         return this.memoryStorage;
       } else {
         return localStorage;
@@ -110,11 +120,16 @@ class StorageManager extends SFStorageManager {
     try {
       storage.setItem(key, value);
     } catch (e) {
-      console.error("Exception while trying to setItem in StorageManager:", e);
-      alert("The application's local storage is out of space. If you have Session History save-to-disk enabled, please disable it, and try again.");
+      console.error('Exception while trying to setItem in StorageManager:', e);
+      alert(
+        "The application's local storage is out of space. If you have Session History save-to-disk enabled, please disable it, and try again."
+      );
     }
 
-    if(vaultKey === StorageManager.FixedEncrypted || (!vaultKey && this.itemsStorageMode === StorageManager.FixedEncrypted)) {
+    if (
+      vaultKey === StorageManager.FixedEncrypted ||
+      (!vaultKey && this.itemsStorageMode === StorageManager.FixedEncrypted)
+    ) {
       this.writeEncryptedStorageToDisk();
     }
   }
@@ -141,9 +156,9 @@ class StorageManager extends SFStorageManager {
   storageAsHash() {
     var hash = {};
     var length = this.storage.length;
-    for(var i = 0; i < length; i++) {
+    for (var i = 0; i < length; i++) {
       var key = this.storage.key(i);
-      hash[key] = this.storage.getItem(key)
+      hash[key] = this.storage.getItem(key);
     }
     return hash;
   }
@@ -159,30 +174,41 @@ class StorageManager extends SFStorageManager {
     encryptedStorage.content.storage = this.storageAsHash();
 
     // Save new encrypted storage in Fixed storage
-    var params = new SFItemParams(encryptedStorage, this.encryptedStorageKeys, this.encryptedStorageAuthParams);
-    params.paramsForSync().then((syncParams) => {
-      this.setItem("encryptedStorage", JSON.stringify(syncParams), StorageManager.Fixed);
-    })
+    var params = new SFItemParams(
+      encryptedStorage,
+      this.encryptedStorageKeys,
+      this.encryptedStorageAuthParams
+    );
+    params.paramsForSync().then(syncParams => {
+      this.setItem(
+        'encryptedStorage',
+        JSON.stringify(syncParams),
+        StorageManager.Fixed
+      );
+    });
   }
 
   async decryptStorage() {
-    var stored = JSON.parse(this.getItemSync("encryptedStorage", StorageManager.Fixed));
+    var stored = JSON.parse(
+      this.getItemSync('encryptedStorage', StorageManager.Fixed)
+    );
     await SFJS.itemTransformer.decryptItem(stored, this.encryptedStorageKeys);
     var encryptedStorage = new SNEncryptedStorage(stored);
 
-    for(var key of Object.keys(encryptedStorage.content.storage)) {
+    for (var key of Object.keys(encryptedStorage.content.storage)) {
       this.setItem(key, encryptedStorage.storage[key]);
     }
   }
 
   hasPasscode() {
-    return this.getItemSync("encryptedStorage", StorageManager.Fixed) !== null;
+    return this.getItemSync('encryptedStorage', StorageManager.Fixed) !== null;
   }
 
   bestStorageMode() {
-    return this.hasPasscode() ? StorageManager.FixedEncrypted : StorageManager.Fixed;
+    return this.hasPasscode()
+      ? StorageManager.FixedEncrypted
+      : StorageManager.Fixed;
   }
-
 
   /*
   Model Storage
@@ -192,11 +218,11 @@ class StorageManager extends SFStorageManager {
   */
 
   setModelStorageMode(mode) {
-    if(mode == this.modelStorageMode) {
+    if (mode == this.modelStorageMode) {
       return;
     }
 
-    if(mode == StorageManager.Ephemeral) {
+    if (mode == StorageManager.Ephemeral) {
       // Clear IndexedDB
       this.dbManager.clearAllModels(null);
     } else {
@@ -208,12 +234,12 @@ class StorageManager extends SFStorageManager {
 
   async getAllModels() {
     return new Promise((resolve, reject) => {
-      if(this.modelStorageMode == StorageManager.Fixed) {
+      if (this.modelStorageMode == StorageManager.Fixed) {
         this.dbManager.getAllModels(resolve);
       } else {
         resolve();
       }
-    })
+    });
   }
 
   async saveModel(item) {
@@ -222,7 +248,7 @@ class StorageManager extends SFStorageManager {
 
   async saveModels(items, onsuccess, onerror) {
     return new Promise((resolve, reject) => {
-      if(this.modelStorageMode == StorageManager.Fixed) {
+      if (this.modelStorageMode == StorageManager.Fixed) {
         this.dbManager.saveModels(items, resolve, reject);
       } else {
         resolve();
@@ -232,7 +258,7 @@ class StorageManager extends SFStorageManager {
 
   async deleteModel(item) {
     return new Promise((resolve, reject) => {
-      if(this.modelStorageMode == StorageManager.Fixed) {
+      if (this.modelStorageMode == StorageManager.Fixed) {
         this.dbManager.deleteModel(item, resolve);
       } else {
         resolve();
@@ -247,8 +273,6 @@ class StorageManager extends SFStorageManager {
   }
 }
 
-StorageManager.FixedEncrypted = "FixedEncrypted"; // encrypted memoryStorage + localStorage persistence
-StorageManager.Ephemeral = "Ephemeral"; // memoryStorage
-StorageManager.Fixed = "Fixed"; // localStorage
-
-angular.module('app').service('storageManager', StorageManager);
+StorageManager.FixedEncrypted = 'FixedEncrypted'; // encrypted memoryStorage + localStorage persistence
+StorageManager.Ephemeral = 'Ephemeral'; // memoryStorage
+StorageManager.Fixed = 'Fixed'; // localStorage

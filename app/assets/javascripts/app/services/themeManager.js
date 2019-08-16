@@ -1,12 +1,20 @@
-class ThemeManager {
+import _ from 'lodash';
+import { SNTheme } from 'snjs';
+import { StorageManager } from './storageManager';
 
-  constructor(componentManager, desktopManager, storageManager, passcodeManager) {
+export class ThemeManager {
+  constructor(
+    componentManager,
+    desktopManager,
+    storageManager,
+    passcodeManager
+  ) {
     this.componentManager = componentManager;
     this.storageManager = storageManager;
     this.desktopManager = desktopManager;
     this.activeThemes = [];
 
-    ThemeManager.CachedThemesKey = "cachedThemes";
+    ThemeManager.CachedThemesKey = 'cachedThemes';
 
     this.registerObservers();
 
@@ -15,7 +23,7 @@ class ThemeManager {
     // so that it's readable without authentication.
     passcodeManager.addPasscodeChangeObserver(() => {
       this.cacheThemes();
-    })
+    });
 
     // The desktop application won't have its applicationDataPath until the angular document is ready,
     // so it wont be able to resolve local theme urls until thats ready
@@ -25,31 +33,35 @@ class ThemeManager {
   }
 
   activateCachedThemes() {
-    let cachedThemes = this.getCachedThemes();
-    let writeToCache = false;
-    for(var theme of cachedThemes) {
+    const cachedThemes = this.getCachedThemes();
+    const writeToCache = false;
+    for (var theme of cachedThemes) {
       this.activateTheme(theme, writeToCache);
     }
   }
 
   registerObservers() {
-    this.desktopManager.registerUpdateObserver((component) => {
+    this.desktopManager.registerUpdateObserver(component => {
       // Reload theme if active
-      if(component.active && component.isTheme()) {
+      if (component.active && component.isTheme()) {
         this.deactivateTheme(component);
         setTimeout(() => {
           this.activateTheme(component);
         }, 10);
       }
-    })
+    });
 
-    this.componentManager.registerHandler({identifier: "themeManager", areas: ["themes"], activationHandler: (component) => {
-      if(component.active) {
-        this.activateTheme(component);
-      } else {
-        this.deactivateTheme(component);
+    this.componentManager.registerHandler({
+      identifier: 'themeManager',
+      areas: ['themes'],
+      activationHandler: component => {
+        if (component.active) {
+          this.activateTheme(component);
+        } else {
+          this.deactivateTheme(component);
+        }
       }
-    }});
+    });
   }
 
   hasActiveTheme() {
@@ -58,8 +70,8 @@ class ThemeManager {
 
   deactivateAllThemes() {
     var activeThemes = this.componentManager.getActiveThemes();
-    for(var theme of activeThemes) {
-      if(theme) {
+    for (var theme of activeThemes) {
+      if (theme) {
         this.componentManager.deactivateComponent(theme);
       }
     }
@@ -68,57 +80,69 @@ class ThemeManager {
   }
 
   activateTheme(theme, writeToCache = true) {
-    if(_.find(this.activeThemes, {uuid: theme.uuid})) {
+    if (_.find(this.activeThemes, { uuid: theme.uuid })) {
       return;
     }
 
     this.activeThemes.push(theme);
 
     var url = this.componentManager.urlForComponent(theme);
-    var link = document.createElement("link");
+    var link = document.createElement('link');
     link.href = url;
-    link.type = "text/css";
-    link.rel = "stylesheet";
-    link.media = "screen,print";
+    link.type = 'text/css';
+    link.rel = 'stylesheet';
+    link.media = 'screen,print';
     link.id = theme.uuid;
-    document.getElementsByTagName("head")[0].appendChild(link);
+    document.getElementsByTagName('head')[0].appendChild(link);
 
-    if(writeToCache) {
+    if (writeToCache) {
       this.cacheThemes();
     }
   }
 
   deactivateTheme(theme) {
     var element = document.getElementById(theme.uuid);
-    if(element) {
+    if (element) {
       element.disabled = true;
       element.parentNode.removeChild(element);
     }
 
-    _.remove(this.activeThemes, {uuid: theme.uuid});
+    _.remove(this.activeThemes, { uuid: theme.uuid });
 
     this.cacheThemes();
   }
 
   async cacheThemes() {
-    let mapped = await Promise.all(this.activeThemes.map(async (theme) => {
-      let transformer = new SFItemParams(theme);
-      let params = await transformer.paramsForLocalStorage();
-      return params;
-    }));
-    let data = JSON.stringify(mapped);
-    return this.storageManager.setItem(ThemeManager.CachedThemesKey, data, StorageManager.Fixed);
+    const mapped = await Promise.all(
+      this.activeThemes.map(async theme => {
+        const transformer = new SFItemParams(theme);
+        const params = await transformer.paramsForLocalStorage();
+        return params;
+      })
+    );
+    const data = JSON.stringify(mapped);
+    return this.storageManager.setItem(
+      ThemeManager.CachedThemesKey,
+      data,
+      StorageManager.Fixed
+    );
   }
 
   async decacheThemes() {
-    return this.storageManager.removeItem(ThemeManager.CachedThemesKey, StorageManager.Fixed);
+    return this.storageManager.removeItem(
+      ThemeManager.CachedThemesKey,
+      StorageManager.Fixed
+    );
   }
 
   getCachedThemes() {
-    let cachedThemes = this.storageManager.getItemSync(ThemeManager.CachedThemesKey, StorageManager.Fixed);
-    if(cachedThemes) {
-      let parsed = JSON.parse(cachedThemes);
-      return parsed.map((theme) => {
+    const cachedThemes = this.storageManager.getItemSync(
+      ThemeManager.CachedThemesKey,
+      StorageManager.Fixed
+    );
+    if (cachedThemes) {
+      const parsed = JSON.parse(cachedThemes);
+      return parsed.map(theme => {
         return new SNTheme(theme);
       });
     } else {
@@ -126,5 +150,3 @@ class ThemeManager {
     }
   }
 }
-
-angular.module('app').service('themeManager', ThemeManager);

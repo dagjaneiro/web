@@ -1,13 +1,12 @@
-class ComponentModal {
-
+export class ComponentModal {
   constructor() {
-    this.restrict = "E";
-    this.templateUrl = "directives/component-modal.html";
+    this.restrict = 'E';
+    this.templateUrl = 'directives/component-modal.html';
     this.scope = {
-      show: "=",
-      component: "=",
-      callback: "=",
-      onDismiss: "&"
+      show: '=',
+      component: '=',
+      callback: '=',
+      onDismiss: '&'
     };
   }
 
@@ -21,11 +20,10 @@ class ComponentModal {
     $scope.dismiss = function(callback) {
       $scope.el.remove();
       $scope.$destroy();
-      $scope.onDismiss && $scope.onDismiss() && $scope.onDismiss()($scope.component);
+      $scope.onDismiss &&
+        $scope.onDismiss() &&
+        $scope.onDismiss()($scope.component);
       callback && callback();
-    }
+    };
   }
-
 }
-
-angular.module('app').directive('componentModal', () => new ComponentModal);

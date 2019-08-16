@@ -1,6 +1,16 @@
-class MigrationManager extends SFMigrationManager {
+import { isDesktopApplication } from '../utils';
 
-  constructor($rootScope, modelManager, syncManager, componentManager, storageManager, statusManager, authManager, desktopManager) {
+export class MigrationManager extends SFMigrationManager {
+  constructor(
+    $rootScope,
+    modelManager,
+    syncManager,
+    componentManager,
+    storageManager,
+    statusManager,
+    authManager,
+    desktopManager
+  ) {
     super(modelManager, syncManager, storageManager, authManager);
     this.componentManager = componentManager;
     this.statusManager = statusManager;
@@ -22,34 +32,37 @@ class MigrationManager extends SFMigrationManager {
 
   editorToComponentMigration() {
     return {
-      name: "editor-to-component",
-      content_type: "SN|Editor",
-      handler: async (editors) => {
+      name: 'editor-to-component',
+      content_type: 'SN|Editor',
+      handler: async editors => {
         // Convert editors to components
-        for(var editor of editors) {
+        for (var editor of editors) {
           // If there's already a component for this url, then skip this editor
-          if(editor.url && !this.componentManager.componentForUrl(editor.url)) {
+          if (
+            editor.url &&
+            !this.componentManager.componentForUrl(editor.url)
+          ) {
             var component = this.modelManager.createItem({
-              content_type: "SN|Component",
+              content_type: 'SN|Component',
               content: {
                 url: editor.url,
                 name: editor.name,
-                area: "editor-editor"
+                area: 'editor-editor'
               }
-            })
-            component.setAppDataItem("data", editor.data);
+            });
+            component.setAppDataItem('data', editor.data);
             this.modelManager.addItem(component);
             this.modelManager.setItemDirty(component, true);
           }
         }
 
-        for(let editor of editors) {
+        for (const editor of editors) {
           this.modelManager.setItemToBeDeleted(editor);
         }
 
         this.syncManager.sync();
       }
-    }
+    };
   }
 
   /*
@@ -65,31 +78,40 @@ class MigrationManager extends SFMigrationManager {
   */
   componentUrlToHostedUrl() {
     return {
-      name: "component-url-to-hosted-url",
-      content_type: "SN|Component",
-      handler: async (components) => {
+      name: 'component-url-to-hosted-url',
+      content_type: 'SN|Component',
+      handler: async components => {
         let hasChanges = false;
-        let notes = this.modelManager.validItemsForContentType("Note");
-        for(let note of notes) {
-          for(let component of components) {
-            let clientData = note.getDomainDataItem(component.hosted_url, ComponentManager.ClientDataDomain);
-            if(clientData) {
-              note.setDomainDataItem(component.uuid, clientData, ComponentManager.ClientDataDomain);
-              note.setDomainDataItem(component.hosted_url, null, ComponentManager.ClientDataDomain);
+        const notes = this.modelManager.validItemsForContentType('Note');
+        for (const note of notes) {
+          for (const component of components) {
+            const clientData = note.getDomainDataItem(
+              component.hosted_url,
+              ComponentManager.ClientDataDomain
+            );
+            if (clientData) {
+              note.setDomainDataItem(
+                component.uuid,
+                clientData,
+                ComponentManager.ClientDataDomain
+              );
+              note.setDomainDataItem(
+                component.hosted_url,
+                null,
+                ComponentManager.ClientDataDomain
+              );
               this.modelManager.setItemDirty(note, true);
               hasChanges = true;
             }
           }
         }
 
-        if(hasChanges) {
+        if (hasChanges) {
           this.syncManager.sync();
         }
       }
-    }
+    };
   }
-
-
 
   /*
   Migrate notes which have relationships on tags to migrate those relationships to the tags themselves.
@@ -99,54 +121,61 @@ class MigrationManager extends SFMigrationManager {
   */
   removeTagReferencesFromNotes() {
     return {
-      name: "remove-tag-references-from-notes",
-      content_type: "Note",
-      handler: async (notes) => {
-
-        let needsSync = false;
-        let status = this.statusManager.addStatusFromString("Optimizing data...");
+      name: 'remove-tag-references-from-notes',
+      content_type: 'Note',
+      handler: async notes => {
+        const needsSync = false;
+        let status = this.statusManager.addStatusFromString(
+          'Optimizing data...'
+        );
         let dirtyCount = 0;
 
-        for(let note of notes) {
-          if(!note.content) {
+        for (const note of notes) {
+          if (!note.content) {
             continue;
           }
 
-          let references = note.content.references;
+          const references = note.content.references;
           // Remove any tag references, and transfer them to the tag if neccessary.
-          let newReferences = [];
+          const newReferences = [];
 
-          for(let reference of references)  {
-            if(reference.content_type != "Tag") {
+          for (const reference of references) {
+            if (reference.content_type != 'Tag') {
               newReferences.push(reference);
               continue;
             }
 
             // is Tag content_type, we will not be adding this to newReferences
-            let tag = this.modelManager.findItem(reference.uuid);
-            if(tag && !tag.hasRelationshipWithItem(note)) {
+            const tag = this.modelManager.findItem(reference.uuid);
+            if (tag && !tag.hasRelationshipWithItem(note)) {
               tag.addItemAsRelationship(note);
               this.modelManager.setItemDirty(tag, true);
               dirtyCount++;
             }
           }
 
-          if(newReferences.length != references.length) {
+          if (newReferences.length != references.length) {
             note.content.references = newReferences;
             this.modelManager.setItemDirty(note, true);
             dirtyCount++;
           }
         }
 
-        if(dirtyCount > 0) {
-          if(isDesktopApplication()) {
+        if (dirtyCount > 0) {
+          if (isDesktopApplication()) {
             this.desktopManager.saveBackup();
           }
 
-          status = this.statusManager.replaceStatusWithString(status, `${dirtyCount} items optimized.`);
+          status = this.statusManager.replaceStatusWithString(
+            status,
+            `${dirtyCount} items optimized.`
+          );
           await this.syncManager.sync();
 
-          status = this.statusManager.replaceStatusWithString(status, `Optimization complete.`);
+          status = this.statusManager.replaceStatusWithString(
+            status,
+            `Optimization complete.`
+          );
           setTimeout(() => {
             this.statusManager.removeStatus(status);
           }, 2000);
@@ -154,8 +183,6 @@ class MigrationManager extends SFMigrationManager {
           this.statusManager.removeStatus(status);
         }
       }
-    }
+    };
   }
 }
-
-angular.module('app').service('migrationManager', MigrationManager);

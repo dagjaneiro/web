@@ -1,8 +1,16 @@
 // An interface used by the Desktop app to interact with SN
+import _ from 'lodash';
+import { isDesktopApplication } from '../utils';
 
-class DesktopManager {
-
-  constructor($rootScope, $timeout, modelManager, syncManager, authManager, passcodeManager) {
+export class DesktopManager {
+  constructor(
+    $rootScope,
+    $timeout,
+    modelManager,
+    syncManager,
+    authManager,
+    passcodeManager
+  ) {
     this.passcodeManager = passcodeManager;
     this.modelManager = modelManager;
     this.authManager = authManager;
@@ -14,18 +22,18 @@ class DesktopManager {
 
     this.isDesktop = isDesktopApplication();
 
-    $rootScope.$on("initial-data-loaded", () => {
+    $rootScope.$on('initial-data-loaded', () => {
       this.dataLoaded = true;
-      if(this.dataLoadHandler) {
+      if (this.dataLoadHandler) {
         this.dataLoadHandler();
       }
     });
 
-    $rootScope.$on("major-data-change", () => {
-      if(this.majorDataChangeHandler) {
+    $rootScope.$on('major-data-change', () => {
+      if (this.majorDataChangeHandler) {
         this.majorDataChangeHandler();
       }
-    })
+    });
   }
 
   saveBackup() {
@@ -33,7 +41,7 @@ class DesktopManager {
   }
 
   getApplicationDataPath() {
-    console.assert(this.applicationDataPath, "applicationDataPath is null");
+    console.assert(this.applicationDataPath, 'applicationDataPath is null');
     return this.applicationDataPath;
   }
 
@@ -47,39 +55,42 @@ class DesktopManager {
 
   // All `components` should be installed
   syncComponentsInstallation(components) {
-    if(!this.isDesktop) return;
+    if (!this.isDesktop) return;
 
-    Promise.all(components.map((component) => {
-      return this.convertComponentForTransmission(component);
-    })).then((data) => {
+    Promise.all(
+      components.map(component => {
+        return this.convertComponentForTransmission(component);
+      })
+    ).then(data => {
       this.installationSyncHandler(data);
-    })
+    });
   }
 
   async installComponent(component) {
-    this.installComponentHandler(await this.convertComponentForTransmission(component));
+    this.installComponentHandler(
+      await this.convertComponentForTransmission(component)
+    );
   }
 
   registerUpdateObserver(callback) {
-    var observer = {id: Math.random, callback: callback};
+    var observer = { id: Math.random, callback: callback };
     this.updateObservers.push(observer);
     return observer;
   }
 
   searchText(text) {
-    if(!this.isDesktop) {
+    if (!this.isDesktop) {
       return;
     }
     this.lastSearchedText = text;
     this.searchHandler(text);
   }
 
-  redoSearch()  {
-    if(this.lastSearchedText) {
+  redoSearch() {
+    if (this.lastSearchedText) {
       this.searchText(this.lastSearchedText);
     }
   }
-
 
   deregisterUpdateObserver(observer) {
     _.pull(this.updateObservers, observer);
@@ -91,47 +102,53 @@ class DesktopManager {
   }
 
   desktop_windowGainedFocus() {
-    this.$rootScope.$broadcast("window-gained-focus");
+    this.$rootScope.$broadcast('window-gained-focus');
   }
 
   desktop_windowLostFocus() {
-    this.$rootScope.$broadcast("window-lost-focus");
+    this.$rootScope.$broadcast('window-lost-focus');
   }
 
   desktop_onComponentInstallationComplete(componentData, error) {
     // console.log("Web|Component Installation/Update Complete", componentData, error);
 
     // Desktop is only allowed to change these keys:
-    let permissableKeys = ["package_info", "local_url"];
+    const permissableKeys = ['package_info', 'local_url'];
     var component = this.modelManager.findItem(componentData.uuid);
 
-    if(!component) {
-      console.error("desktop_onComponentInstallationComplete component is null for uuid", componentData.uuid);
+    if (!component) {
+      console.error(
+        'desktop_onComponentInstallationComplete component is null for uuid',
+        componentData.uuid
+      );
       return;
     }
 
-    if(error) {
-      component.setAppDataItem("installError", error);
+    if (error) {
+      component.setAppDataItem('installError', error);
     } else {
-      for(var key of permissableKeys) {
+      for (var key of permissableKeys) {
         component[key] = componentData.content[key];
       }
-      this.modelManager.notifySyncObserversOfModels([component], SFModelManager.MappingSourceDesktopInstalled);
-      component.setAppDataItem("installError", null);
+      this.modelManager.notifySyncObserversOfModels(
+        [component],
+        SFModelManager.MappingSourceDesktopInstalled
+      );
+      component.setAppDataItem('installError', null);
     }
 
     this.modelManager.setItemDirty(component, true);
     this.syncManager.sync();
 
     this.timeout(() => {
-      for(var observer of this.updateObservers) {
+      for (var observer of this.updateObservers) {
         observer.callback(component);
       }
     });
   }
 
   desktop_registerComponentActivationObserver(callback) {
-    var observer = {id: Math.random, callback: callback};
+    var observer = { id: Math.random, callback: callback };
     this.componentActivationObservers.push(observer);
     return observer;
   }
@@ -142,10 +159,12 @@ class DesktopManager {
 
   /* Notify observers that a component has been registered/activated */
   async notifyComponentActivation(component) {
-    var serializedComponent = await this.convertComponentForTransmission(component);
+    var serializedComponent = await this.convertComponentForTransmission(
+      component
+    );
 
     this.timeout(() => {
-      for(var observer of this.componentActivationObservers) {
+      for (var observer of this.componentActivationObservers) {
         observer.callback(serializedComponent);
       }
     });
@@ -166,14 +185,14 @@ class DesktopManager {
 
   desktop_setInitialDataLoadHandler(handler) {
     this.dataLoadHandler = handler;
-    if(this.dataLoaded) {
+    if (this.dataLoaded) {
       this.dataLoadHandler();
     }
   }
 
   async desktop_requestBackupFile(callback) {
     var keys, authParams;
-    if(this.authManager.offline() && this.passcodeManager.hasPasscode()) {
+    if (this.authManager.offline() && this.passcodeManager.hasPasscode()) {
       keys = this.passcodeManager.keys();
       authParams = this.passcodeManager.passcodeAuthParams();
     } else {
@@ -181,13 +200,11 @@ class DesktopManager {
       authParams = await this.authManager.getAuthParams();
     }
 
-    this.modelManager.getAllItemsJSONData(
-      keys,
-      authParams,
-      true /* return null on empty */
-    ).then((data) => {
-      callback(data);
-    })
+    this.modelManager
+      .getAllItemsJSONData(keys, authParams, true /* return null on empty */)
+      .then(data => {
+        callback(data);
+      });
   }
 
   desktop_setMajorDataChangeHandler(handler) {
@@ -195,12 +212,10 @@ class DesktopManager {
   }
 
   desktop_didBeginBackup() {
-    this.$rootScope.$broadcast("did-begin-local-backup");
+    this.$rootScope.$broadcast('did-begin-local-backup');
   }
 
   desktop_didFinishBackup(success) {
-    this.$rootScope.$broadcast("did-finish-local-backup", {success: success});
+    this.$rootScope.$broadcast('did-finish-local-backup', { success: success });
   }
 }
-
-angular.module('app').service('desktopManager', DesktopManager);

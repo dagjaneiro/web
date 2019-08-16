@@ -1,14 +1,13 @@
-class InputModal {
-
+export class InputModal {
   constructor() {
-    this.restrict = "E";
-    this.templateUrl = "directives/input-modal.html";
+    this.restrict = 'E';
+    this.templateUrl = 'directives/input-modal.html';
     this.scope = {
-      type: "=",
-      title: "=",
-      message: "=",
-      placeholder: "=",
-      callback: "&"
+      type: '=',
+      title: '=',
+      message: '=',
+      placeholder: '=',
+      callback: '&'
     };
   }
 
@@ -16,7 +15,14 @@ class InputModal {
     $scope.el = el;
   }
 
-  controller($scope, modelManager, archiveManager, authManager, syncManager, $timeout) {
+  controller(
+    $scope,
+    modelManager,
+    archiveManager,
+    authManager,
+    syncManager,
+    $timeout
+  ) {
     'ngInject';
 
     $scope.formData = {};
@@ -24,15 +30,11 @@ class InputModal {
     $scope.dismiss = function() {
       $scope.el.remove();
       $scope.$destroy();
-    }
+    };
 
     $scope.submit = function() {
       $scope.callback()($scope.formData.input);
       $scope.dismiss();
-    }
-
-
+    };
   }
 }
-
-angular.module('app').directive('inputModal', () => new InputModal);

@@ -1,20 +1,32 @@
+import _ from 'lodash';
+import {
+  SNNote,
+  SNTag,
+  SNSmartTag,
+  SNExtension,
+  SNEditor,
+  SNTheme,
+  SNComponent,
+  SNServerExtension,
+  SNMfa
+} from 'snjs';
+
 SFModelManager.ContentTypeClassMapping = {
-  "Note" : SNNote,
-  "Tag" : SNTag,
-  "SN|SmartTag" : SNSmartTag,
-  "Extension" : SNExtension,
-  "SN|Editor" : SNEditor,
-  "SN|Theme" : SNTheme,
-  "SN|Component" : SNComponent,
-  "SF|Extension" : SNServerExtension,
-  "SF|MFA" : SNMfa,
-  "SN|Privileges" : SFPrivileges
+  Note: SNNote,
+  Tag: SNTag,
+  'SN|SmartTag': SNSmartTag,
+  Extension: SNExtension,
+  'SN|Editor': SNEditor,
+  'SN|Theme': SNTheme,
+  'SN|Component': SNComponent,
+  'SF|Extension': SNServerExtension,
+  'SF|MFA': SNMfa,
+  'SN|Privileges': SFPrivileges
 };
 
-SFItem.AppDomain = "org.standardnotes.sn";
+SFItem.AppDomain = 'org.standardnotes.sn';
 
-class ModelManager extends SFModelManager {
-
+export class ModelManager extends SFModelManager {
   constructor(storageManager, $timeout) {
     super($timeout);
     this.notes = [];
@@ -34,11 +46,11 @@ class ModelManager extends SFModelManager {
   }
 
   noteCount() {
-    return this.notes.filter((n) => !n.dummy).length;
+    return this.notes.filter(n => !n.dummy).length;
   }
 
   removeAllItemsFromMemory() {
-    for(var item of this.items) {
+    for (var item of this.items) {
       item.deleted = true;
     }
     this.notifySyncObserversOfModels(this.items);
@@ -46,9 +58,9 @@ class ModelManager extends SFModelManager {
   }
 
   findOrCreateTagByTitle(title) {
-    var tag = _.find(this.tags, {title: title})
-    if(!tag) {
-      tag = this.createItem({content_type: "Tag", content: {title: title}});
+    var tag = _.find(this.tags, { title: title });
+    if (!tag) {
+      tag = this.createItem({ content_type: 'Tag', content: { title: title } });
       this.addItem(tag);
       this.setItemDirty(tag, true);
     }
@@ -58,23 +70,27 @@ class ModelManager extends SFModelManager {
   addItems(items, globalOnly = false) {
     super.addItems(items, globalOnly);
 
-    items.forEach((item) => {
+    items.forEach(item => {
       // In some cases, you just want to add the item to this.items, and not to the individual arrays
       // This applies when you want to keep an item syncable, but not display it via the individual arrays
-      if(!globalOnly) {
-        if(item.content_type == "Tag") {
-          if(!_.find(this.tags, {uuid: item.uuid})) {
-            this.tags.splice(_.sortedIndexBy(this.tags, item, function(item){
-              if (item.title) return item.title.toLowerCase();
-              else return ''
-            }), 0, item);
+      if (!globalOnly) {
+        if (item.content_type == 'Tag') {
+          if (!_.find(this.tags, { uuid: item.uuid })) {
+            this.tags.splice(
+              _.sortedIndexBy(this.tags, item, function(item) {
+                if (item.title) return item.title.toLowerCase();
+                else return '';
+              }),
+              0,
+              item
+            );
           }
-        } else if(item.content_type == "Note") {
-          if(!_.find(this.notes, {uuid: item.uuid})) {
+        } else if (item.content_type == 'Note') {
+          if (!_.find(this.notes, { uuid: item.uuid })) {
             this.notes.unshift(item);
           }
-        } else if(item.content_type == "SN|Component") {
-          if(!_.find(this.components, {uuid: item.uuid})) {
+        } else if (item.content_type == 'SN|Component') {
+          if (!_.find(this.components, { uuid: item.uuid })) {
             this.components.unshift(item);
           }
         }
@@ -84,10 +100,14 @@ class ModelManager extends SFModelManager {
 
   resortTag(tag) {
     _.pull(this.tags, tag);
-    this.tags.splice(_.sortedIndexBy(this.tags, tag, function(tag){
-      if (tag.title) return tag.title.toLowerCase();
-      else return ''
-    }), 0, tag);
+    this.tags.splice(
+      _.sortedIndexBy(this.tags, tag, function(tag) {
+        if (tag.title) return tag.title.toLowerCase();
+        else return '';
+      }),
+      0,
+      tag
+    );
   }
 
   setItemToBeDeleted(item) {
@@ -107,28 +127,32 @@ class ModelManager extends SFModelManager {
   }
 
   removeItemFromRespectiveArray(item) {
-    if(item.content_type == "Tag") {
-      _.remove(this.tags, {uuid: item.uuid});
-    } else if(item.content_type == "Note") {
-      _.remove(this.notes, {uuid: item.uuid});
-    } else if(item.content_type == "SN|Component") {
-      _.remove(this.components, {uuid: item.uuid});
+    if (item.content_type == 'Tag') {
+      _.remove(this.tags, { uuid: item.uuid });
+    } else if (item.content_type == 'Note') {
+      _.remove(this.notes, { uuid: item.uuid });
+    } else if (item.content_type == 'SN|Component') {
+      _.remove(this.components, { uuid: item.uuid });
     }
   }
 
   notesMatchingSmartTag(tag) {
-    let contentTypePredicate = new SFPredicate("content_type", "=", "Note");
-    let predicates = [contentTypePredicate, tag.content.predicate];
-    if(!tag.content.isTrashTag) {
-      let notTrashedPredicate = new SFPredicate("content.trashed", "=", false);
+    const contentTypePredicate = new SFPredicate('content_type', '=', 'Note');
+    const predicates = [contentTypePredicate, tag.content.predicate];
+    if (!tag.content.isTrashTag) {
+      const notTrashedPredicate = new SFPredicate(
+        'content.trashed',
+        '=',
+        false
+      );
       predicates.push(notTrashedPredicate);
     }
-    let results = this.itemsMatchingPredicates(predicates);
+    const results = this.itemsMatchingPredicates(predicates);
     return results;
   }
 
   trashSmartTag() {
-    return this.systemSmartTags.find((tag) => tag.content.isTrashTag);
+    return this.systemSmartTags.find(tag => tag.content.isTrashTag);
   }
 
   trashedItems() {
@@ -136,8 +160,8 @@ class ModelManager extends SFModelManager {
   }
 
   emptyTrash() {
-    let notes = this.trashedItems();
-    for(let note of notes) {
+    const notes = this.trashedItems();
+    for (const note of notes) {
       this.setItemToBeDeleted(note);
     }
   }
@@ -147,13 +171,15 @@ class ModelManager extends SFModelManager {
   }
 
   getSmartTagWithId(id) {
-    return this.getSmartTags().find((candidate) => candidate.uuid == id);
+    return this.getSmartTags().find(candidate => candidate.uuid == id);
   }
 
   getSmartTags() {
-    let userTags = this.validItemsForContentType("SN|SmartTag").sort((a, b) => {
-      return a.content.title < b.content.title ? -1 : 1;
-    });
+    const userTags = this.validItemsForContentType('SN|SmartTag').sort(
+      (a, b) => {
+        return a.content.title < b.content.title ? -1 : 1;
+      }
+    );
     return this.systemSmartTags.concat(userTags);
   }
 
@@ -163,21 +189,18 @@ class ModelManager extends SFModelManager {
 
   humanReadableDisplayForContentType(contentType) {
     return {
-      "Note" : "note",
-      "Tag" : "tag",
-      "SN|SmartTag": "smart tag",
-      "Extension" : "action-based extension",
-      "SN|Component" : "component",
-      "SN|Editor" : "editor",
-      "SN|Theme" : "theme",
-      "SF|Extension" : "server extension",
-      "SF|MFA" : "two-factor authentication setting",
-      "SN|FileSafe|Credentials": "FileSafe credential",
-      "SN|FileSafe|FileMetadata": "FileSafe file",
-      "SN|FileSafe|Integration": "FileSafe integration"
+      Note: 'note',
+      Tag: 'tag',
+      'SN|SmartTag': 'smart tag',
+      Extension: 'action-based extension',
+      'SN|Component': 'component',
+      'SN|Editor': 'editor',
+      'SN|Theme': 'theme',
+      'SF|Extension': 'server extension',
+      'SF|MFA': 'two-factor authentication setting',
+      'SN|FileSafe|Credentials': 'FileSafe credential',
+      'SN|FileSafe|FileMetadata': 'FileSafe file',
+      'SN|FileSafe|Integration': 'FileSafe integration'
     }[contentType];
   }
-
 }
-
-angular.module('app').service('modelManager', ModelManager);

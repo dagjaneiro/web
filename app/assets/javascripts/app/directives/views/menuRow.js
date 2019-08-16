@@ -1,25 +1,24 @@
-class MenuRow {
-
+export class MenuRow {
   constructor() {
-    this.restrict = "E";
+    this.restrict = 'E';
     this.transclude = true;
-    this.templateUrl = "directives/menu-row.html";
+    this.templateUrl = 'directives/menu-row.html';
     this.scope = {
-      action: "&",
-      circle: "=",
-      circleAlign: "=",
-      label: "=",
-      subtitle: "=",
-      hasButton: "=",
-      buttonText: "=",
-      buttonClass: "=",
-      buttonAction: "&",
-      spinnerClass: "=",
-      subRows: "=",
-      faded: "=",
-      desc: "=",
-      disabled: "=",
-      stylekitClass: "="
+      action: '&',
+      circle: '=',
+      circleAlign: '=',
+      label: '=',
+      subtitle: '=',
+      hasButton: '=',
+      buttonText: '=',
+      buttonClass: '=',
+      buttonAction: '&',
+      spinnerClass: '=',
+      subRows: '=',
+      faded: '=',
+      desc: '=',
+      disabled: '=',
+      stylekitClass: '='
     };
   }
 
@@ -27,23 +26,20 @@ class MenuRow {
     'ngInject';
 
     $scope.onClick = function($event) {
-      if($scope.disabled) {
+      if ($scope.disabled) {
         return;
       }
       $event.stopPropagation();
       $scope.action();
-    }
+    };
 
     // This is for the accessory button
     $scope.clickButton = function($event) {
-      if($scope.disabled) {
+      if ($scope.disabled) {
         return;
       }
       $event.stopPropagation();
       $scope.buttonAction();
-    }
-
+    };
   }
 }
-
-angular.module('app').directive('menuRow', () => new MenuRow);
