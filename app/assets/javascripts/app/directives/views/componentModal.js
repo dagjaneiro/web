@@ -1,7 +1,9 @@
+import template from '%/directives/component-modal.pug';
+
 export class ComponentModal {
   constructor() {
     this.restrict = 'E';
-    this.templateUrl = 'directives/component-modal.html';
+    this.template = template;
     this.scope = {
       show: '=',
       component: '=',

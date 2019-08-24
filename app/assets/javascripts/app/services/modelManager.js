@@ -10,6 +10,10 @@ import {
   SNServerExtension,
   SNMfa
 } from 'snjs';
+// import { SFItem } from 'standard-file-js/lib/app/models/item';
+import { SFModelManager } from 'standard-file-js/lib/app/lib/modelManager';
+import { SFPrivileges } from 'standard-file-js/lib/app/models/privileges/privileges';
+import { SFPredicate } from 'standard-file-js/lib/app/models/predicate';
 
 SFModelManager.ContentTypeClassMapping = {
   Note: SNNote,
@@ -24,7 +28,7 @@ SFModelManager.ContentTypeClassMapping = {
   'SN|Privileges': SFPrivileges
 };
 
-SFItem.AppDomain = 'org.standardnotes.sn';
+window.SFItem.AppDomain = 'org.standardnotes.sn';
 
 export class ModelManager extends SFModelManager {
   constructor(storageManager, $timeout) {
@@ -74,7 +78,7 @@ export class ModelManager extends SFModelManager {
       // In some cases, you just want to add the item to this.items, and not to the individual arrays
       // This applies when you want to keep an item syncable, but not display it via the individual arrays
       if (!globalOnly) {
-        if (item.content_type == 'Tag') {
+        if (item.content_type === 'Tag') {
           if (!_.find(this.tags, { uuid: item.uuid })) {
             this.tags.splice(
               _.sortedIndexBy(this.tags, item, function(item) {
@@ -85,11 +89,11 @@ export class ModelManager extends SFModelManager {
               item
             );
           }
-        } else if (item.content_type == 'Note') {
+        } else if (item.content_type === 'Note') {
           if (!_.find(this.notes, { uuid: item.uuid })) {
             this.notes.unshift(item);
           }
-        } else if (item.content_type == 'SN|Component') {
+        } else if (item.content_type === 'SN|Component') {
           if (!_.find(this.components, { uuid: item.uuid })) {
             this.components.unshift(item);
           }
@@ -127,11 +131,11 @@ export class ModelManager extends SFModelManager {
   }
 
   removeItemFromRespectiveArray(item) {
-    if (item.content_type == 'Tag') {
+    if (item.content_type === 'Tag') {
       _.remove(this.tags, { uuid: item.uuid });
-    } else if (item.content_type == 'Note') {
+    } else if (item.content_type === 'Note') {
       _.remove(this.notes, { uuid: item.uuid });
-    } else if (item.content_type == 'SN|Component') {
+    } else if (item.content_type === 'SN|Component') {
       _.remove(this.components, { uuid: item.uuid });
     }
   }
@@ -171,7 +175,7 @@ export class ModelManager extends SFModelManager {
   }
 
   getSmartTagWithId(id) {
-    return this.getSmartTags().find(candidate => candidate.uuid == id);
+    return this.getSmartTags().find(candidate => candidate.uuid === id);
   }
 
   getSmartTags() {

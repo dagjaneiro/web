@@ -1,4 +1,8 @@
 import _ from 'lodash';
+import angular from 'angular';
+import { SFModelManager } from 'standard-file-js/lib/app/lib/modelManager';
+import { SFItemParams } from 'standard-file-js/lib/app/models/itemParams';
+import { Action } from 'snjs';
 
 export class ActionsManager {
   constructor(
@@ -83,7 +87,7 @@ export class ActionsManager {
 
     action.running = true;
 
-    const decrypted = action.access_type == 'decrypted';
+    const decrypted = action.access_type === 'decrypted';
 
     var triedPasswords = [];
 

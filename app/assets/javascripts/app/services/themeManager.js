@@ -1,6 +1,8 @@
 import _ from 'lodash';
+import angular from 'angular';
 import { SNTheme } from 'snjs';
 import { StorageManager } from './storageManager';
+import { SFItemParams } from 'standard-file-js/lib/app/models/itemParams';
 
 export class ThemeManager {
   constructor(

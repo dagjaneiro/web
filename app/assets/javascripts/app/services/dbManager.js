@@ -96,7 +96,7 @@ export class DBManager {
   }
 
   saveModels(items, onsuccess, onerror) {
-    if (items.length == 0) {
+    if (items.length === 0) {
       if (onsuccess) {
         onsuccess();
       }
@@ -118,13 +118,15 @@ export class DBManager {
       transaction.onabort = function(event) {
         console.log('Offline saving aborted:', event);
         var error = event.target.error;
-        if (error.name == 'QuotaExceededError') {
+        if (error.name === 'QuotaExceededError') {
           alert(
             'Unable to save changes locally because your device is out of space. Please free up some disk space and try again, otherwise, your data may end up in an inconsistent state.'
           );
         } else {
           alert(
-            `Unable to save changes locally due to an unknown system issue. Issue Code: ${error.code} Issue Name: ${error.name}.`
+            `Unable to save changes locally due to an unknown system issue. Issue Code: ${
+              error.code
+            } Issue Name: ${error.name}.`
           );
         }
         onerror && onerror(error);

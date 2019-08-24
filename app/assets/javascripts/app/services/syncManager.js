@@ -1,3 +1,6 @@
+import angular from 'angular';
+import { SFSyncManager } from 'standard-file-js/lib/app/lib/syncManager';
+
 export class SyncManager extends SFSyncManager {
   constructor(
     modelManager,

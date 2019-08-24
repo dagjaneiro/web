@@ -1,9 +1,10 @@
-import { isDesktopApplication } from '../../utils';
+import { isDesktopApplication } from '@/utils';
+import template from '%/directives/editor-menu.pug';
 
 export class EditorMenu {
   constructor() {
     this.restrict = 'E';
-    this.templateUrl = 'directives/editor-menu.html';
+    this.template = template;
     this.scope = {
       callback: '&',
       selectedEditor: '=',
@@ -42,7 +43,7 @@ export class EditorMenu {
     };
 
     $scope.toggleDefaultForEditor = function(editor) {
-      if ($scope.defaultEditor == editor) {
+      if ($scope.defaultEditor === editor) {
         $scope.removeEditorDefault(editor);
       } else {
         $scope.makeEditorDefault(editor);
@@ -84,7 +85,7 @@ export class EditorMenu {
         return false;
       }
 
-      if (component == $scope.selectedEditor) {
+      if (component === $scope.selectedEditor) {
         return true;
       } else {
         return false;

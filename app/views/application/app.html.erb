@@ -37,14 +37,14 @@
     <% if Rails.env.development? %>
       <%= javascript_include_tag "app.js", debug: true %>
     <% else %>
-      <%= javascript_include_tag "compiled.min.js", debug: false %>
+      <%= javascript_include_tag "app.js", debug: false %>
     <% end %>
     <%= stylesheet_link_tag "app", media: "all", debug: false %>
 
   </head>
 
   <body>
-    <div ng-controller="HomeCtrl" ng-include="'home.html'"></div>
+    <home-section />
   </body>
 
 </html>

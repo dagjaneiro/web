@@ -1,7 +1,6 @@
 'use strict';
 
 import angular from 'angular';
-import constants from './constants.json';
 import { configRoutes } from './routes';
 import {
   editorSection,
@@ -12,6 +11,7 @@ import {
   notesCtrl,
   tagsSection,
   tagsCtrl,
+  homeSection,
   homeCtrl,
   LockScreen
 } from './controllers';
@@ -71,15 +71,15 @@ import {
   ThemeManager
 } from './services';
 
+console.log('Starting SN modular build.');
+
 angular.module('app', ['ngSanitize']);
 
-// Constants
-Object.entries(constants).forEach(([key, value]) =>
-  angular.module('app').constant(key, value)
-);
-
 // Config
-angular.module('app').config(configRoutes);
+angular
+  .module('app')
+  .config(configRoutes)
+  .constant('appVersion', __VERSION__);
 
 // Controllers
 angular
@@ -92,6 +92,7 @@ angular
   .controller('NotesCtrl', notesCtrl)
   .directive('tagsSection', tagsSection)
   .controller('TagsCtrl', tagsCtrl)
+  .directive('homeSection', homeSection)
   .controller('HomeCtrl', homeCtrl)
   .directive('lockScreen', () => new LockScreen());
 

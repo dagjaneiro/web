@@ -1,5 +1,6 @@
 /* A class for handling installation of system extensions */
-import { isDesktopApplication } from '../utils';
+import { isDesktopApplication } from '@/utils';
+import { SFPredicate } from 'standard-file-js/lib/app/models/predicate';
 
 export class NativeExtManager {
   constructor(modelManager, syncManager, singletonManager) {
@@ -52,7 +53,7 @@ export class NativeExtManager {
 
         // Handle addition of SN|ExtensionRepo permission
         const permission = resolvedSingleton.content.permissions.find(
-          p => p.name == 'stream-items'
+          p => p.name === 'stream-items'
         );
         if (!permission.content_types.includes('SN|ExtensionRepo')) {
           permission.content_types.push('SN|ExtensionRepo');

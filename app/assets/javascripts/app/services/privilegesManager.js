@@ -1,3 +1,6 @@
+import angular from 'angular';
+import { SFPrivilegesManager } from 'standard-file-js/lib/app/lib/privileges/privilegesManager';
+
 export class PrivilegesManager extends SFPrivilegesManager {
   constructor(
     passcodeManager,

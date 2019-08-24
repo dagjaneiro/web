@@ -1,7 +1,9 @@
+import template from '%/directives/password-wizard.pug';
+
 export class PasswordWizard {
   constructor() {
     this.restrict = 'E';
-    this.templateUrl = 'directives/password-wizard.html';
+    this.template = template;
     this.scope = {
       type: '='
     };
@@ -74,10 +76,10 @@ export class PasswordWizard {
     };
 
     $scope.configure = (function() {
-      if ($scope.type == 'change-pw') {
+      if ($scope.type === 'change-pw') {
         $scope.title = 'Change Password';
         $scope.changePassword = true;
-      } else if ($scope.type == 'upgrade-security') {
+      } else if ($scope.type === 'upgrade-security') {
         $scope.title = 'Security Update';
         $scope.securityUpdate = true;
       }
@@ -93,7 +95,7 @@ export class PasswordWizard {
 
       $scope.isContinuing = true;
 
-      if ($scope.step == FinishStep) {
+      if ($scope.step === FinishStep) {
         $scope.dismiss();
         return;
       }
@@ -126,7 +128,7 @@ export class PasswordWizard {
     };
 
     $scope.preprocessorForStep = function(step) {
-      if (step == PasswordStep) {
+      if (step === PasswordStep) {
         return (onSuccess, onFail) => {
           $scope.showSpinner = true;
           $scope.continueTitle = 'Generating Keys...';
@@ -149,7 +151,7 @@ export class PasswordWizard {
       'There was an error re-encrypting your items. Your password was changed, but not all your items were properly re-encrypted and synced. You should try syncing again. If all else fails, you should restore your notes from backup.';
 
     $scope.initializeStep = function(step) {
-      if (step == SyncStep) {
+      if (step === SyncStep) {
         $scope.lockContinue = true;
         $scope.formData.status = 'Processing encryption keys...';
         $scope.formData.processing = true;
@@ -184,7 +186,7 @@ export class PasswordWizard {
               'Unable to process your password. Please try again.';
           }
         });
-      } else if (step == FinishStep) {
+      } else if (step === FinishStep) {
         $scope.continueTitle = 'Finish';
       }
     };
@@ -195,20 +197,20 @@ export class PasswordWizard {
         ? currentPassword
         : $scope.formData.newPassword;
 
-      if (!currentPassword || currentPassword.length == 0) {
+      if (!currentPassword || currentPassword.length === 0) {
         alert('Please enter your current password.');
         callback(false);
         return;
       }
 
       if ($scope.changePassword) {
-        if (!newPass || newPass.length == 0) {
+        if (!newPass || newPass.length === 0) {
           alert('Please enter a new password.');
           callback(false);
           return;
         }
 
-        if (newPass != $scope.formData.newPasswordConfirmation) {
+        if (newPass !== $scope.formData.newPasswordConfirmation) {
           alert('Your new password does not match its confirmation.');
           $scope.formData.status = null;
           callback(false);
@@ -270,7 +272,7 @@ export class PasswordWizard {
       const newAuthParams = results.authParams;
 
       // perform a sync beforehand to pull in any last minutes changes before we change the encryption key (and thus cant decrypt new changes)
-      const syncResponse = await syncManager.sync();
+      await syncManager.sync();
       authManager
         .changePassword(
           await syncManager.getServerURL(),

@@ -1,8 +1,11 @@
+import { PrivilegesManager } from '@/services/privilegesManager';
+import template from '%/footer.pug';
+
 export function footerSection(authManager) {
   return {
     restrict: 'E',
     scope: {},
-    templateUrl: 'footer.html',
+    template: template,
     replace: true,
     controller: 'FooterCtrl',
     controllerAs: 'ctrl',
@@ -96,7 +99,7 @@ export function footerCtrl(
     // A reload occurs when the extensions manager window is opened. We can close it after a delay
     const extWindow = this.rooms.find(room => {
       return (
-        room.package_info.identifier ==
+        room.package_info.identifier ===
         nativeExtManager.extensionsManagerIdentifier
       );
     });
@@ -126,14 +129,14 @@ export function footerCtrl(
 
   syncManager.addEventHandler((syncEvent, data) => {
     $timeout(() => {
-      if (syncEvent == 'local-data-loaded') {
+      if (syncEvent === 'local-data-loaded') {
         // If the user has no notes and is offline, show Account menu
-        if (this.offline && modelManager.noteCount() == 0) {
+        if (this.offline && modelManager.noteCount() === 0) {
           this.showAccountMenu = true;
         }
-      } else if (syncEvent == 'enter-out-of-sync') {
+      } else if (syncEvent === 'enter-out-of-sync') {
         this.outOfSync = true;
-      } else if (syncEvent == 'exit-out-of-sync') {
+      } else if (syncEvent === 'exit-out-of-sync') {
         this.outOfSync = false;
       }
     });
@@ -229,7 +232,7 @@ export function footerCtrl(
     'SN|Component',
     (allItems, validItems, deletedItems, source) => {
       this.rooms = modelManager.components.filter(candidate => {
-        return candidate.area == 'rooms' && !candidate.deleted;
+        return candidate.area === 'rooms' && !candidate.deleted;
       });
       if (this.queueExtReload) {
         this.queueExtReload = false;
@@ -251,7 +254,7 @@ export function footerCtrl(
           return a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1;
         });
 
-      const differ = themes.length != this.themesWithIcons.length;
+      const differ = themes.length !== this.themesWithIcons.length;
 
       this.themesWithIcons = themes;
 
@@ -280,11 +283,11 @@ export function footerCtrl(
       var aType = a.icon.type;
       var bType = b.icon.type;
 
-      if (aType == bType) {
+      if (aType === bType) {
         return 0;
-      } else if (aType == 'circle' && bType == 'svg') {
+      } else if (aType === 'circle' && bType === 'svg') {
         return -1;
-      } else if (bType == 'circle' && aType == 'svg') {
+      } else if (bType === 'circle' && aType === 'svg') {
         return 1;
       }
     });
@@ -312,7 +315,7 @@ export function footerCtrl(
       // it shouldn't open on another computer. Active state should only be persisted for persistent extensions, like Folders.
     },
     actionHandler: (component, action, data) => {
-      if (action == 'set-size') {
+      if (action === 'set-size') {
         component.setLastSize(data);
       }
     },

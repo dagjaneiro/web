@@ -1,8 +1,10 @@
+import template from '%/directives/menu-row.pug';
+
 export class MenuRow {
   constructor() {
     this.restrict = 'E';
     this.transclude = true;
-    this.templateUrl = 'directives/menu-row.html';
+    this.template = template;
     this.scope = {
       action: '&',
       circle: '=',

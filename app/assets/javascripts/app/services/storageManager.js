@@ -1,4 +1,6 @@
 import { SNEncryptedStorage } from 'snjs';
+import { SFStorageManager } from 'standard-file-js/lib/app/lib/storageManager';
+import { SFItemParams } from 'standard-file-js/lib/app/models/itemParams';
 
 export class MemoryStorage {
   constructor() {
@@ -91,9 +93,9 @@ export class StorageManager extends SFStorageManager {
       }
       this.storage = newStorage;
 
-      if (mode == StorageManager.FixedEncrypted) {
+      if (mode === StorageManager.FixedEncrypted) {
         this.writeEncryptedStorageToDisk();
-      } else if (mode == StorageManager.Fixed) {
+      } else if (mode === StorageManager.Fixed) {
         // Remove encrypted storage
         this.removeItem('encryptedStorage', StorageManager.Fixed);
       }
@@ -103,8 +105,8 @@ export class StorageManager extends SFStorageManager {
   getVault(vaultKey) {
     if (vaultKey) {
       if (
-        vaultKey == StorageManager.Ephemeral ||
-        vaultKey == StorageManager.FixedEncrypted
+        vaultKey === StorageManager.Ephemeral ||
+        vaultKey === StorageManager.FixedEncrypted
       ) {
         return this.memoryStorage;
       } else {
@@ -218,11 +220,11 @@ export class StorageManager extends SFStorageManager {
   */
 
   setModelStorageMode(mode) {
-    if (mode == this.modelStorageMode) {
+    if (mode === this.modelStorageMode) {
       return;
     }
 
-    if (mode == StorageManager.Ephemeral) {
+    if (mode === StorageManager.Ephemeral) {
       // Clear IndexedDB
       this.dbManager.clearAllModels(null);
     } else {
@@ -234,7 +236,7 @@ export class StorageManager extends SFStorageManager {
 
   async getAllModels() {
     return new Promise((resolve, reject) => {
-      if (this.modelStorageMode == StorageManager.Fixed) {
+      if (this.modelStorageMode === StorageManager.Fixed) {
         this.dbManager.getAllModels(resolve);
       } else {
         resolve();
@@ -248,7 +250,7 @@ export class StorageManager extends SFStorageManager {
 
   async saveModels(items, onsuccess, onerror) {
     return new Promise((resolve, reject) => {
-      if (this.modelStorageMode == StorageManager.Fixed) {
+      if (this.modelStorageMode === StorageManager.Fixed) {
         this.dbManager.saveModels(items, resolve, reject);
       } else {
         resolve();
@@ -258,7 +260,7 @@ export class StorageManager extends SFStorageManager {
 
   async deleteModel(item) {
     return new Promise((resolve, reject) => {
-      if (this.modelStorageMode == StorageManager.Fixed) {
+      if (this.modelStorageMode === StorageManager.Fixed) {
         this.dbManager.deleteModel(item, resolve);
       } else {
         resolve();

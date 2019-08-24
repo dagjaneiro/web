@@ -1,7 +1,9 @@
+import template from '%/directives/privileges-auth-modal.pug';
+
 export class PrivilegesAuthModal {
   constructor() {
     this.restrict = 'E';
-    this.templateUrl = 'directives/privileges-auth-modal.html';
+    this.template = template;
     this.scope = {
       action: '=',
       onSuccess: '=',
@@ -60,7 +62,7 @@ export class PrivilegesAuthModal {
       }
       return (
         $scope.failedCredentials.find(candidate => {
-          return candidate == credential;
+          return candidate === credential;
         }) != null
       );
     };
@@ -69,13 +71,13 @@ export class PrivilegesAuthModal {
       var failed = [];
       for (var cred of $scope.requiredCredentials) {
         var value = $scope.authenticationParameters[cred];
-        if (!value || value.length == 0) {
+        if (!value || value.length === 0) {
           failed.push(cred);
         }
       }
 
       $scope.failedCredentials = failed;
-      return failed.length == 0;
+      return failed.length === 0;
     };
 
     $scope.submit = function() {

@@ -32,13 +32,13 @@ export class KeyboardManager {
       // For a modifier like ctrlKey, must check both event.ctrlKey and event.key.
       // That's because on keyup, event.ctrlKey would be false, but event.key == Control would be true.
       const matches =
-        ((event.ctrlKey || event.key == KeyboardManager.KeyModifierCtrl) &&
+        ((event.ctrlKey || event.key === KeyboardManager.KeyModifierCtrl) &&
           modifier === KeyboardManager.KeyModifierCtrl) ||
-        ((event.metaKey || event.key == KeyboardManager.KeyModifierMeta) &&
+        ((event.metaKey || event.key === KeyboardManager.KeyModifierMeta) &&
           modifier === KeyboardManager.KeyModifierMeta) ||
-        ((event.altKey || event.key == KeyboardManager.KeyModifierAlt) &&
+        ((event.altKey || event.key === KeyboardManager.KeyModifierAlt) &&
           modifier === KeyboardManager.KeyModifierAlt) ||
-        ((event.shiftKey || event.key == KeyboardManager.KeyModifierShift) &&
+        ((event.shiftKey || event.key === KeyboardManager.KeyModifierShift) &&
           modifier === KeyboardManager.KeyModifierShift);
 
       return matches;
@@ -50,7 +50,7 @@ export class KeyboardManager {
   eventMatchesKeyAndModifiers(event, key, modifiers = []) {
     const eventModifiers = this.modifiersForEvent(event);
 
-    if (eventModifiers.length != modifiers.length) {
+    if (eventModifiers.length !== modifiers.length) {
       return false;
     }
 
@@ -67,12 +67,12 @@ export class KeyboardManager {
 
     // In the browser, shift + f results in key 'f', but in Electron, shift + f results in 'F'
     // In our case we don't differentiate between the two.
-    return key.toLowerCase() == event.key.toLowerCase();
+    return key.toLowerCase() === event.key.toLowerCase();
   }
 
   notifyObserver(event, keyEventType) {
     for (const observer of this.observers) {
-      if (observer.element && event.target != observer.element) {
+      if (observer.element && event.target !== observer.element) {
         continue;
       }
 
@@ -80,7 +80,7 @@ export class KeyboardManager {
         continue;
       }
 
-      if (observer.notElement && observer.notElement == event.target) {
+      if (observer.notElement && observer.notElement === event.target) {
         continue;
       }
 
@@ -99,7 +99,7 @@ export class KeyboardManager {
         )
       ) {
         const callback =
-          keyEventType == KeyboardManager.KeyEventDown
+          keyEventType === KeyboardManager.KeyEventDown
             ? observer.onKeyDown
             : observer.onKeyUp;
         if (callback) {

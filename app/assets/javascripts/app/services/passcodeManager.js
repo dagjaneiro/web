@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import { isDesktopApplication } from '../utils';
+import { isDesktopApplication } from '@/utils';
 import { StorageManager } from './storageManager';
 
 const MillisecondsPerSecond = 1000;
@@ -95,18 +95,16 @@ export class PasscodeManager {
   }
 
   async verifyPasscode(passcode) {
-    return new Promise(async (resolve, reject) => {
-      var params = this.passcodeAuthParams();
-      const keys = await SFJS.crypto.computeEncryptionKeysForUser(
-        passcode,
-        params
-      );
-      if (keys.pw !== params.hash) {
-        resolve(false);
-      } else {
-        resolve(true);
-      }
-    });
+    var params = this.passcodeAuthParams();
+    const keys = await SFJS.crypto.computeEncryptionKeysForUser(
+      passcode,
+      params
+    );
+    if (keys.pw !== params.hash) {
+      return false;
+    } else {
+      return true;
+    }
   }
 
   unlock(passcode, callback) {
@@ -207,7 +205,7 @@ export class PasscodeManager {
     } else {
       // tab visibility listender, web only
       document.addEventListener('visibilitychange', e => {
-        const visible = document.visibilityState == 'visible';
+        const visible = document.visibilityState === 'visible';
         this.documentVisibilityChanged(visible);
       });
     }
@@ -271,7 +269,7 @@ export class PasscodeManager {
 
   async beginAutoLockTimer() {
     var interval = await this.getAutoLockInterval();
-    if (interval == PasscodeManager.AutoLockIntervalNone) {
+    if (interval === PasscodeManager.AutoLockIntervalNone) {
       return;
     }
 

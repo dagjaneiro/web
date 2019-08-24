@@ -1,5 +1,5 @@
 export function getParameterByName(name, url) {
-  name = name.replace(/[\[\]]/g, '\\$&');
+  name = name.replace(/[[\]]/g, '\\$&');
   var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)');
   var results = regex.exec(url);
   if (!results) return null;
@@ -49,17 +49,19 @@ export function isMacApplication() {
     window &&
     window.process &&
     window.process.type &&
-    window.process.platform == 'darwin'
+    window.process.platform === 'darwin'
   );
 }
 
 /* Use with numbers and strings, not objects */
+// eslint-disable-next-line no-extend-native
 Array.prototype.containsPrimitiveSubset = function(array) {
   return !array.some(val => this.indexOf(val) === -1);
 };
 
 // https://tc39.github.io/ecma262/#sec-array.prototype.includes
 if (!Array.prototype.includes) {
+  // eslint-disable-next-line no-extend-native
   Object.defineProperty(Array.prototype, 'includes', {
     value: function(searchElement, fromIndex) {
       if (this == null) {

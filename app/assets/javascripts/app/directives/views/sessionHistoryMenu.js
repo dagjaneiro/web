@@ -1,7 +1,9 @@
+import template from '%/directives/session-history-menu.pug';
+
 export class SessionHistoryMenu {
   constructor() {
     this.restrict = 'E';
-    this.templateUrl = 'directives/session-history-menu.html';
+    this.template = template;
     this.scope = {
       item: '='
     };
@@ -33,11 +35,11 @@ export class SessionHistoryMenu {
 
     $scope.classForRevision = function(revision) {
       var vector = revision.operationVector();
-      if (vector == 0) {
+      if (vector === 0) {
         return 'default';
-      } else if (vector == 1) {
+      } else if (vector === 1) {
         return 'success';
-      } else if (vector == -1) {
+      } else if (vector === -1) {
         return 'danger';
       }
     };

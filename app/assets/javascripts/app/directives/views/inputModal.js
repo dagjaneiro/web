@@ -1,7 +1,9 @@
+import template from '%/directives/input-modal.pug';
+
 export class InputModal {
   constructor() {
     this.restrict = 'E';
-    this.templateUrl = 'directives/input-modal.html';
+    this.template = template;
     this.scope = {
       type: '=',
       title: '=',

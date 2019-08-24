@@ -1,7 +1,10 @@
+import { PrivilegesManager } from '@/services/privilegesManager';
+import template from '%/directives/privileges-management-modal.pug';
+
 export class PrivilegesManagementModal {
   constructor() {
     this.restrict = 'E';
-    this.templateUrl = 'directives/privileges-management-modal.html';
+    this.template = template;
     this.scope = {};
   }
 
@@ -27,9 +30,9 @@ export class PrivilegesManagementModal {
 
     $scope.displayInfoForCredential = function(credential) {
       const info = privilegesManager.displayInfoForCredential(credential);
-      if (credential == PrivilegesManager.CredentialLocalPasscode) {
+      if (credential === PrivilegesManager.CredentialLocalPasscode) {
         info['availability'] = $scope.hasPasscode;
-      } else if (credential == PrivilegesManager.CredentialAccountPassword) {
+      } else if (credential === PrivilegesManager.CredentialAccountPassword) {
         info['availability'] = $scope.hasAccount;
       } else {
         info['availability'] = true;

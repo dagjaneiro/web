@@ -1,6 +1,8 @@
 // An interface used by the Desktop app to interact with SN
 import _ from 'lodash';
-import { isDesktopApplication } from '../utils';
+import { isDesktopApplication } from '@/utils';
+import { SFItemParams } from 'standard-file-js/lib/app/models/itemParams';
+import { SFModelManager } from 'standard-file-js/lib/app/lib/modelManager';
 
 export class DesktopManager {
   constructor(
@@ -97,18 +99,22 @@ export class DesktopManager {
   }
 
   // Pass null to cancel search
+  // eslint-disable-next-line camelcase
   desktop_setSearchHandler(handler) {
     this.searchHandler = handler;
   }
 
+  // eslint-disable-next-line camelcase
   desktop_windowGainedFocus() {
     this.$rootScope.$broadcast('window-gained-focus');
   }
 
+  // eslint-disable-next-line camelcase
   desktop_windowLostFocus() {
     this.$rootScope.$broadcast('window-lost-focus');
   }
 
+  // eslint-disable-next-line camelcase
   desktop_onComponentInstallationComplete(componentData, error) {
     // console.log("Web|Component Installation/Update Complete", componentData, error);
 
@@ -147,12 +153,14 @@ export class DesktopManager {
     });
   }
 
+  // eslint-disable-next-line camelcase
   desktop_registerComponentActivationObserver(callback) {
     var observer = { id: Math.random, callback: callback };
     this.componentActivationObservers.push(observer);
     return observer;
   }
 
+  // eslint-disable-next-line camelcase
   desktop_deregisterComponentActivationObserver(observer) {
     _.pull(this.componentActivationObservers, observer);
   }
@@ -171,18 +179,22 @@ export class DesktopManager {
   }
 
   /* Used to resolve "sn://" */
+  // eslint-disable-next-line camelcase
   desktop_setApplicationDataPath(path) {
     this.applicationDataPath = path;
   }
 
+  // eslint-disable-next-line camelcase
   desktop_setComponentInstallationSyncHandler(handler) {
     this.installationSyncHandler = handler;
   }
 
+  // eslint-disable-next-line camelcase
   desktop_setInstallComponentHandler(handler) {
     this.installComponentHandler = handler;
   }
 
+  // eslint-disable-next-line camelcase
   desktop_setInitialDataLoadHandler(handler) {
     this.dataLoadHandler = handler;
     if (this.dataLoaded) {
@@ -190,6 +202,7 @@ export class DesktopManager {
     }
   }
 
+  // eslint-disable-next-line camelcase
   async desktop_requestBackupFile(callback) {
     var keys, authParams;
     if (this.authManager.offline() && this.passcodeManager.hasPasscode()) {
@@ -207,14 +220,17 @@ export class DesktopManager {
       });
   }
 
+  // eslint-disable-next-line camelcase
   desktop_setMajorDataChangeHandler(handler) {
     this.majorDataChangeHandler = handler;
   }
 
+  // eslint-disable-next-line camelcase
   desktop_didBeginBackup() {
     this.$rootScope.$broadcast('did-begin-local-backup');
   }
 
+  // eslint-disable-next-line camelcase
   desktop_didFinishBackup(success) {
     this.$rootScope.$broadcast('did-finish-local-backup', { success: success });
   }

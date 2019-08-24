@@ -1,7 +1,9 @@
+import template from '%/directives/permissions-modal.pug';
+
 export class PermissionsModal {
   constructor() {
     this.restrict = 'E';
-    this.templateUrl = 'directives/permissions-modal.html';
+    this.template = template;
     this.scope = {
       show: '=',
       component: '=',

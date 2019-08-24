@@ -1,5 +1,9 @@
-import { isDesktopApplication } from '../utils';
-import { KeyboardManager } from '../services/keyboardManager';
+import angular from 'angular';
+import { SFModelManager } from 'standard-file-js/lib/app/lib/modelManager';
+import { isDesktopApplication } from '@/utils';
+import { KeyboardManager } from '@/services/keyboardManager';
+import { PrivilegesManager } from '@/services/privilegesManager';
+import template from '%/editor.pug';
 
 export function editorSection($timeout, $sce) {
   return {
@@ -9,7 +13,7 @@ export function editorSection($timeout, $sce) {
       note: '=',
       updateTags: '&'
     },
-    templateUrl: 'editor.html',
+    template,
     replace: true,
     controller: 'EditorCtrl',
     controllerAs: 'ctrl',
@@ -53,22 +57,22 @@ export function editorCtrl(
       return;
     }
 
-    if (eventName == 'sync:taking-too-long') {
+    if (eventName === 'sync:taking-too-long') {
       this.syncTakingTooLong = true;
-    } else if (eventName == 'sync:completed') {
+    } else if (eventName === 'sync:completed') {
       this.syncTakingTooLong = false;
       if (this.note.dirty) {
         // if we're still dirty, don't change status, a sync is likely upcoming.
       } else {
         const savedItem = data.savedItems.find(
-          item => item.uuid == this.note.uuid
+          item => item.uuid === this.note.uuid
         );
         const isInErrorState = this.saveError;
         if (isInErrorState || savedItem) {
           this.showAllChangesSavedStatus();
         }
       }
-    } else if (eventName == 'sync:error') {
+    } else if (eventName === 'sync:error') {
       // only show error status in editor if the note is dirty. Otherwise, it means the originating sync
       // came from somewhere else and we don't want to display an error here.
       if (this.note.dirty) {
@@ -110,8 +114,8 @@ export function editorCtrl(
         return;
       }
 
-      var matchingNote = allItems.find(item => {
-        return item.uuid == this.note.uuid;
+      const matchingNote = allItems.find(item => {
+        return item.uuid === this.note.uuid;
       });
 
       if (!matchingNote) {
@@ -131,7 +135,7 @@ export function editorCtrl(
         return;
       }
 
-      for (var tag of allItems) {
+      for (const tag of allItems) {
         // If a tag is deleted then we'll have lost references to notes. Reload anyway.
         if (
           this.note.savedTagsString == null ||
@@ -157,17 +161,17 @@ export function editorCtrl(
       this.reloadComponentStackArray();
 
       // Observe editor changes to see if the current note should update its editor
-      var editors = allItems.filter(function(item) {
+      const editors = allItems.filter(function(item) {
         return item.isEditor();
       });
 
       // If no editors have changed
-      if (editors.length == 0) {
+      if (editors.length === 0) {
         return;
       }
 
       // Look through editors again and find the most proper one
-      var editor = this.editorForNote(this.note);
+      const editor = this.editorForNote(this.note);
       this.selectedEditor = editor;
       if (!editor) {
         this.reloadFont();
@@ -197,7 +201,7 @@ export function editorCtrl(
     };
 
     const associatedEditor = this.editorForNote(note);
-    if (associatedEditor && associatedEditor != this.selectedEditor) {
+    if (associatedEditor && associatedEditor !== this.selectedEditor) {
       // setting note to not ready will remove the editor from view in a flash,
       // so we only want to do this if switching between external editors
       this.noteReady = false;
@@ -215,11 +219,11 @@ export function editorCtrl(
       onReady();
     }
 
-    if (note.safeText().length == 0 && note.dummy) {
+    if (note.safeText().length === 0 && note.dummy) {
       this.focusTitle(100);
     }
 
-    if (oldNote && oldNote != note) {
+    if (oldNote && oldNote !== note) {
       if (oldNote.dirty) {
         this.saveNote(oldNote);
       } else if (oldNote.dummy) {
@@ -247,23 +251,23 @@ export function editorCtrl(
       'showExtensions',
       'showSessionHistory'
     ];
-    for (var candidate of allMenus) {
-      if (candidate != menu) {
+    for (const candidate of allMenus) {
+      if (candidate !== menu) {
         this[candidate] = false;
       }
     }
   };
 
   this.editorMenuOnSelect = function(component) {
-    if (!component || component.area == 'editor-editor') {
+    if (!component || component.area === 'editor-editor') {
       // if plain editor or other editor
       this.showEditorMenu = false;
-      var editor = component;
+      const editor = component;
       if (this.selectedEditor && editor !== this.selectedEditor) {
         this.disassociateComponentWithCurrentNote(this.selectedEditor);
       }
       if (editor) {
-        if (this.note.getAppDataItem('prefersPlainEditor') == true) {
+        if (this.note.getAppDataItem('prefersPlainEditor') === true) {
           this.note.setAppDataItem('prefersPlainEditor', false);
           modelManager.setItemDirty(this.note, true);
         }
@@ -280,7 +284,7 @@ export function editorCtrl(
       }
 
       this.selectedEditor = editor;
-    } else if (component.area == 'editor-stack') {
+    } else if (component.area === 'editor-stack') {
       // If component stack item
       this.toggleStackComponentForCurrentItem(component);
     }
@@ -295,7 +299,7 @@ export function editorCtrl(
 
   this.focusEditor = function(delay) {
     setTimeout(function() {
-      var element = document.getElementById('note-text-editor');
+      const element = document.getElementById('note-text-editor');
       if (element) {
         element.focus();
       }
@@ -342,8 +346,8 @@ export function editorCtrl(
 
     if (!dontUpdatePreviews) {
       const limit = 80;
-      var text = note.text || '';
-      var truncate = text.length > limit;
+      const text = note.text || '';
+      const truncate = text.length > limit;
       note.content.preview_plain =
         text.substring(0, limit) + (truncate ? '...' : '');
       // Clear dynamic previews if using plain editor
@@ -381,7 +385,7 @@ export function editorCtrl(
     this.saveError = false;
     this.syncTakingTooLong = false;
 
-    var status = 'All changes saved';
+    let status = 'All changes saved';
     if (authManager.offline()) {
       status += ' (offline)';
     }
@@ -566,8 +570,8 @@ export function editorCtrl(
   };
 
   this.addTag = function(tag) {
-    var tags = this.note.tags;
-    var strings = tags.map(function(_tag) {
+    const tags = this.note.tags;
+    const strings = tags.map(function(_tag) {
       return _tag.title;
     });
     strings.push(tag.title);
@@ -576,8 +580,8 @@ export function editorCtrl(
   };
 
   this.removeTag = function(tag) {
-    var tags = this.note.tags;
-    var strings = tags
+    const tags = this.note.tags;
+    const strings = tags
       .map(function(_tag) {
         return _tag.title;
       })
@@ -589,11 +593,11 @@ export function editorCtrl(
   };
 
   this.updateTagsFromTagsString = function() {
-    if (this.tagsString == this.note.tagsString()) {
+    if (this.tagsString === this.note.tagsString()) {
       return;
     }
 
-    var strings = this.tagsString
+    const strings = this.tagsString
       .split('#')
       .filter(string => {
         return string.length > 0;
@@ -673,7 +677,7 @@ export function editorCtrl(
   };
 
   this.reloadFont = function() {
-    var editable = document.getElementById('note-text-editor');
+    const editable = document.getElementById('note-text-editor');
 
     if (!editable) {
       return;
@@ -696,7 +700,7 @@ export function editorCtrl(
     authManager.setUserPrefValue(key, this[key], true);
     this.reloadFont();
 
-    if (key == 'spellcheck') {
+    if (key === 'spellcheck') {
       // Allows textarea to reload
       this.noteReady = false;
       $timeout(() => {
@@ -705,7 +709,7 @@ export function editorCtrl(
           this.reloadFont();
         });
       }, 0);
-    } else if (key == 'marginResizersEnabled' && this[key] == true) {
+    } else if (key === 'marginResizersEnabled' && this[key] === true) {
       $timeout(() => {
         this.leftResizeControl.flash();
         this.rightResizeControl.flash();
@@ -728,13 +732,13 @@ export function editorCtrl(
       if (component.area === 'note-tags') {
         // Autocomplete Tags
         this.tagsComponent = component.active ? component : null;
-      } else if (component.area == 'editor-editor') {
+      } else if (component.area === 'editor-editor') {
         // An editor is already active, ensure the potential replacement is explicitely enabled for this item
         // We also check if the selectedEditor is active. If it's inactive, we want to treat it as an external reference wishing to deactivate this editor (i.e componentView)
         if (
           this.selectedEditor &&
-          this.selectedEditor == component &&
-          component.active == false
+          this.selectedEditor === component &&
+          component.active === false
         ) {
           this.selectedEditor = null;
         } else if (this.selectedEditor) {
@@ -763,14 +767,14 @@ export function editorCtrl(
             this.selectedEditor = null;
           }
         }
-      } else if (component.area == 'editor-stack') {
+      } else if (component.area === 'editor-stack') {
         this.reloadComponentContext();
       }
     },
     contextRequestHandler: component => {
       if (
-        component == this.selectedEditor ||
-        component == this.tagsComponent ||
+        component === this.selectedEditor ||
+        component === this.tagsComponent ||
         this.componentStack.includes(component)
       ) {
         return this.note;
@@ -783,10 +787,10 @@ export function editorCtrl(
     },
     actionHandler: (component, action, data) => {
       if (action === 'set-size') {
-        var setSize = function(element, size) {
-          var widthString =
+        const setSize = function(element, size) {
+          const widthString =
             typeof size.width === 'string' ? size.width : `${data.width}px`;
-          var heightString =
+          const heightString =
             typeof size.height === 'string' ? size.height : `${data.height}px`;
           element.setAttribute(
             'style',
@@ -794,21 +798,21 @@ export function editorCtrl(
           );
         };
 
-        if (data.type == 'container') {
-          if (component.area == 'note-tags') {
-            var container = document.getElementById(
+        if (data.type === 'container') {
+          if (component.area === 'note-tags') {
+            const container = document.getElementById(
               'note-tags-component-container'
             );
             setSize(container, data);
           }
         }
       } else if (action === 'associate-item') {
-        if (data.item.content_type == 'Tag') {
-          var tag = modelManager.findItem(data.item.uuid);
+        if (data.item.content_type === 'Tag') {
+          const tag = modelManager.findItem(data.item.uuid);
           this.addTag(tag);
         }
       } else if (action === 'deassociate-item') {
-        var tag = modelManager.findItem(data.item.uuid);
+        const tag = modelManager.findItem(data.item.uuid);
         this.removeTag(tag);
       } else if (action === 'save-items') {
         if (
@@ -850,7 +854,7 @@ export function editorCtrl(
     would note really ever be undefined? Maybe temprarily when you're deleting a note?
     */
     if (this.note) {
-      for (var component of this.componentStack) {
+      for (const component of this.componentStack) {
         if (component.active) {
           componentManager.setComponentHidden(
             component,
@@ -991,9 +995,9 @@ export function editorCtrl(
         );
         if (!insertSuccessful) {
           // document.execCommand works great on Chrome/Safari but not Firefox
-          var start = editor.selectionStart;
-          var end = editor.selectionEnd;
-          var spaces = '    ';
+          const start = editor.selectionStart;
+          const end = editor.selectionEnd;
+          const spaces = '    ';
 
           // Insert 4 spaces
           editor.value =

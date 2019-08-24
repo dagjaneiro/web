@@ -1,4 +1,6 @@
-import { NoteHistoryEntry } from '../models/noteHistoryEntry';
+import { NoteHistoryEntry } from '@/models/noteHistoryEntry';
+import { SFSessionHistoryManager } from 'standard-file-js/lib/app/lib/session_history/sessionHistoryManager';
+import { SFItemHistory } from 'standard-file-js/lib/app/models/session_history/itemHistory';
 
 export class SessionHistory extends SFSessionHistoryManager {
   constructor(
@@ -20,7 +22,7 @@ export class SessionHistory extends SFSessionHistoryManager {
 
     var keyRequestHandler = async () => {
       const offline = authManager.offline();
-      const auth_params = offline
+      const authParams = offline
         ? passcodeManager.passcodeAuthParams()
         : await authManager.getAuthParams();
       const keys = offline ? passcodeManager.keys() : await authManager.keys();
@@ -28,7 +30,7 @@ export class SessionHistory extends SFSessionHistoryManager {
       return {
         keys: keys,
         offline: offline,
-        auth_params: auth_params
+        auth_params: authParams
       };
     };
 

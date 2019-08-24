@@ -1,3 +1,5 @@
+import { SFItemHistoryEntry } from 'standard-file-js/lib/app/models/session_history/itemHistoryEntry';
+
 export class NoteHistoryEntry extends SFItemHistoryEntry {
   previewTitle() {
     return this.item.updated_at.toLocaleString();

@@ -1,4 +1,6 @@
-import { isDesktopApplication } from '../utils';
+import { isDesktopApplication } from '@/utils';
+import { SFMigrationManager } from 'standard-file-js/lib/app/lib/migrationManager';
+import { ComponentManager } from '@/services/componentManager';
 
 export class MigrationManager extends SFMigrationManager {
   constructor(
@@ -124,7 +126,6 @@ export class MigrationManager extends SFMigrationManager {
       name: 'remove-tag-references-from-notes',
       content_type: 'Note',
       handler: async notes => {
-        const needsSync = false;
         let status = this.statusManager.addStatusFromString(
           'Optimizing data...'
         );
@@ -140,7 +141,7 @@ export class MigrationManager extends SFMigrationManager {
           const newReferences = [];
 
           for (const reference of references) {
-            if (reference.content_type != 'Tag') {
+            if (reference.content_type !== 'Tag') {
               newReferences.push(reference);
               continue;
             }
@@ -154,7 +155,7 @@ export class MigrationManager extends SFMigrationManager {
             }
           }
 
-          if (newReferences.length != references.length) {
+          if (newReferences.length !== references.length) {
             note.content.references = newReferences;
             this.modelManager.setItemDirty(note, true);
             dirtyCount++;

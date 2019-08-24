@@ -1,3 +1,5 @@
+import template from '%/directives/component-view.pug';
+
 import { isDesktopApplication } from '../../utils';
 
 export class ComponentView {
@@ -9,7 +11,7 @@ export class ComponentView {
     themeManager
   ) {
     this.restrict = 'E';
-    this.templateUrl = 'directives/component-view.html';
+    this.template = template;
     this.scope = {
       component: '=',
       onLoad: '=?',
@@ -26,7 +28,7 @@ export class ComponentView {
 
     $scope.updateObserver = this.desktopManager.registerUpdateObserver(
       component => {
-        if (component == $scope.component && component.active) {
+        if (component === $scope.component && component.active) {
           $scope.reloadComponent();
         }
       }
@@ -48,7 +50,7 @@ export class ComponentView {
     'ngInject';
 
     $scope.onVisibilityChange = function() {
-      if (document.visibilityState == 'hidden') {
+      if (document.visibilityState === 'hidden') {
         return;
       }
 
@@ -81,7 +83,7 @@ export class ComponentView {
         });
       },
       actionHandler: (component, action, data) => {
-        if (action == 'set-size') {
+        if (action === 'set-size') {
           componentManager.handleSetSizeEvent(component, data);
         }
       }
@@ -127,7 +129,7 @@ export class ComponentView {
             if (
               isDesktopApplication() &&
               (iframe.contentWindow.origin == null ||
-                iframe.contentWindow.origin == 'null')
+                iframe.contentWindow.origin === 'null')
             ) {
               /*
               Don't attempt reload in this case, as it results in infinite loop, since a reload will deactivate the extension and then reactivate.
@@ -270,7 +272,7 @@ export class ComponentView {
 
     $scope.getUrl = function() {
       var url = componentManager.urlForComponent($scope.component);
-      $scope.component.runningLocally = url == $scope.component.local_url;
+      $scope.component.runningLocally = url === $scope.component.local_url;
       return url;
     };
 

@@ -2,11 +2,12 @@
   The purpose of the conflict resoltion modal is to present two versions of a conflicted item,
   and allow the user to choose which to keep (or to keep both.)
 */
+import template from '%/directives/conflict-resolution-modal.pug';
 
 export class ConflictResolutionModal {
   constructor() {
     this.restrict = 'E';
-    this.templateUrl = 'directives/conflict-resolution-modal.html';
+    this.template = template;
     this.scope = {
       item1: '=',
       item2: '=',

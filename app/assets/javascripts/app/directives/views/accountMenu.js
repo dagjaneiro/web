@@ -1,9 +1,11 @@
-import { isDesktopApplication } from '../../utils';
+import { isDesktopApplication } from '@/utils';
+import { PrivilegesManager } from '@/services/privilegesManager';
+import template from '%/directives/account-menu.pug';
 
 export class AccountMenu {
   constructor() {
     this.restrict = 'E';
-    this.templateUrl = 'directives/account-menu.html';
+    this.template = template;
     this.scope = {
       onSuccessfulAuth: '&',
       closeFunction: '&'
@@ -103,7 +105,10 @@ export class AccountMenu {
                   : { message: 'An unknown error occured.' };
 
                 // MFA Error
-                if (error.tag == 'mfa-required' || error.tag == 'mfa-invalid') {
+                if (
+                  error.tag === 'mfa-required' ||
+                  error.tag === 'mfa-invalid'
+                ) {
                   $scope.formData.showLogin = false;
                   $scope.formData.mfa = error;
                 }
@@ -363,7 +368,7 @@ export class AccountMenu {
         for (var item of items) {
           // We don't want to activate any components during import process in case of exceptions
           // breaking up the import proccess
-          if (item.content_type == 'SN|Component') {
+          if (item.content_type === 'SN|Component') {
             item.active = false;
           }
         }

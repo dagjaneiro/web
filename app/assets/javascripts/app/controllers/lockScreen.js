@@ -1,7 +1,9 @@
+import template from '%/lock-screen.pug';
+
 export class LockScreen {
   constructor() {
     this.restrict = 'E';
-    this.templateUrl = 'lock-screen.html';
+    this.template = template;
     this.scope = {
       onSuccess: '&'
     };
@@ -32,7 +34,7 @@ export class LockScreen {
     });
 
     $scope.submitPasscodeForm = function() {
-      if (!$scope.formData.passcode || $scope.formData.passcode.length == 0) {
+      if (!$scope.formData.passcode || $scope.formData.passcode.length === 0) {
         return;
       }
       passcodeManager.unlock($scope.formData.passcode, success => {

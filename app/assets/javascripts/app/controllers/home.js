@@ -1,5 +1,14 @@
 import _ from 'lodash';
-import { getPlatformString } from '../utils';
+import { SFAuthManager } from 'standard-file-js/lib/app/lib/authManager';
+import { getPlatformString } from '@/utils';
+import template from '%/home.pug';
+
+export function homeSection() {
+  return {
+    template,
+    controller: 'HomeCtrl'
+  };
+}
 
 export function homeCtrl(
   $scope,
@@ -17,6 +26,12 @@ export function homeCtrl(
   privilegesManager,
   statusManager
 ) {
+  $scope.template = template;
+  // Lock syncing until local data is loaded. Syncing may be called from a variety of places,
+  // such as when the window focuses, for example. We don't want sync to occur until all local items are loaded,
+  // otherwise, if sync happens first, then load, the load may override synced values.
+  syncManager.lockSyncing();
+
   storageManager.initialize(
     passcodeManager.hasPasscode(),
     authManager.isEphemeralSession()
@@ -29,10 +44,10 @@ export function homeCtrl(
   };
 
   $rootScope.$on('panel-resized', (event, info) => {
-    if (info.panel == 'notes') {
+    if (info.panel === 'notes') {
       this.notesCollapsed = info.collapsed;
     }
-    if (info.panel == 'tags') {
+    if (info.panel === 'tags') {
       this.tagsCollapsed = info.collapsed;
     }
 
@@ -62,7 +77,9 @@ export function homeCtrl(
 
     this.syncStatusObserver = syncManager.registerSyncStatusObserver(status => {
       if (status.retrievedCount > 20) {
-        var text = `Downloading ${status.retrievedCount} items. Keep app open.`;
+        const text = `Downloading ${
+          status.retrievedCount
+        } items. Keep app open.`;
         this.syncStatus = statusManager.replaceStatusWithString(
           this.syncStatus,
           text
@@ -70,7 +87,7 @@ export function homeCtrl(
         this.showingDownloadStatus = true;
       } else if (this.showingDownloadStatus) {
         this.showingDownloadStatus = false;
-        var text = 'Download Complete.';
+        const text = 'Download Complete.';
         this.syncStatus = statusManager.replaceStatusWithString(
           this.syncStatus,
           text
@@ -92,14 +109,14 @@ export function homeCtrl(
 
     syncManager.setKeyRequestHandler(async () => {
       const offline = authManager.offline();
-      const auth_params = offline
+      const authParams = offline
         ? passcodeManager.passcodeAuthParams()
         : await authManager.getAuthParams();
       const keys = offline ? passcodeManager.keys() : await authManager.keys();
       return {
         keys: keys,
         offline: offline,
-        auth_params: auth_params
+        auth_params: authParams
       };
     });
 
@@ -107,7 +124,7 @@ export function homeCtrl(
 
     syncManager.addEventHandler((syncEvent, data) => {
       $rootScope.$broadcast(syncEvent, data || {});
-      if (syncEvent == 'sync-session-invalid') {
+      if (syncEvent === 'sync-session-invalid') {
         // On Windows, some users experience issues where this message keeps appearing. It might be that on focus, the app syncs, and this message triggers again.
         // We'll only show it once every X seconds
         const showInterval = 30; // At most 30 seconds in between
@@ -123,7 +140,7 @@ export function homeCtrl(
             );
           }, 500);
         }
-      } else if (syncEvent == 'sync-exception') {
+      } else if (syncEvent === 'sync-exception') {
         alert(
           `There was an error while trying to save your items. Please contact support and share this message: ${data}`
         );
@@ -164,7 +181,7 @@ export function homeCtrl(
     });
 
     authManager.addEventHandler(event => {
-      if (event == SFAuthManager.DidSignOutEvent) {
+      if (event === SFAuthManager.DidSignOutEvent) {
         modelManager.handleSignout();
         syncManager.handleSignout();
       }
@@ -230,7 +247,7 @@ export function homeCtrl(
       }
     }
 
-    for (var tag of tags) {
+    for (const tag of tags) {
       tag.addItemAsRelationship(note);
     }
 
@@ -246,7 +263,7 @@ export function homeCtrl(
   $scope.tagsSelectionMade = function(tag) {
     // If a tag is selected twice, then the needed dummy note is removed.
     // So we perform this check.
-    if ($scope.selectedTag && tag && $scope.selectedTag.uuid == tag.uuid) {
+    if ($scope.selectedTag && tag && $scope.selectedTag.uuid === tag.uuid) {
       return;
     }
 
@@ -263,7 +280,7 @@ export function homeCtrl(
   };
 
   $scope.tagsSave = function(tag, callback) {
-    if (!tag.title || tag.title.length == 0) {
+    if (!tag.title || tag.title.length === 0) {
       $scope.removeTag(tag);
       return;
     }
@@ -311,23 +328,20 @@ export function homeCtrl(
 
   $rootScope.safeApply = function(fn) {
     var phase = this.$root.$$phase;
-    if (phase == '$apply' || phase == '$digest') this.$eval(fn);
+    if (phase === '$apply' || phase === '$digest') this.$eval(fn);
     else this.$apply(fn);
   };
 
   $rootScope.notifyDelete = function() {
-    $timeout(
-      function() {
-        $rootScope.$broadcast('noteDeleted');
-      },
-      0
-    );
+    $timeout(function() {
+      $rootScope.$broadcast('noteDeleted');
+    }, 0);
   };
 
   $scope.deleteNote = function(note) {
     modelManager.setItemToBeDeleted(note);
 
-    if (note == $scope.selectedNote) {
+    if (note === $scope.selectedNote) {
       $scope.selectedNote = null;
     }
 
@@ -396,7 +410,6 @@ export function homeCtrl(
         authManager.user.email === email
       ) {
         // already signed in, return
-        
       } else {
         // sign out
         authManager.signout(true).then(() => {

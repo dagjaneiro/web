@@ -1,7 +1,10 @@
+import angular from 'angular';
+import template from '%/directives/panel-resizer.pug';
+
 export class PanelResizer {
   constructor() {
     this.restrict = 'E';
-    this.templateUrl = 'directives/panel-resizer.html';
+    this.template = template;
     this.scope = {
       index: '=',
       panelId: '=',
@@ -57,7 +60,6 @@ export class PanelResizer {
     const minWidth = $scope.minWidth || resizerWidth;
     var pressed = false;
     var startWidth = panel.scrollWidth;
-    var startX = 0;
     var lastDownX = 0;
     var collapsed;
     var lastWidth = startWidth;
@@ -67,7 +69,7 @@ export class PanelResizer {
 
     $scope.isAtMaxWidth = function() {
       return (
-        Math.round(lastWidth + lastLeft) == Math.round(getParentRect().width)
+        Math.round(lastWidth + lastLeft) === Math.round(getParentRect().width)
       );
     };
 
@@ -103,7 +105,7 @@ export class PanelResizer {
       return panel.parentNode.getBoundingClientRect();
     }
 
-    if ($scope.property == 'right') {
+    if ($scope.property === 'right') {
       const handleReize = debounce(event => {
         reloadDefaultValues();
         handleWidthEvent();
@@ -152,7 +154,7 @@ export class PanelResizer {
         width = maxWidth;
       }
 
-      if (Math.round(width + lastLeft) == Math.round(parentRect.width)) {
+      if (Math.round(width + lastLeft) === Math.round(parentRect.width)) {
         panel.style.width = `calc(100% - ${lastLeft}px)`;
         panel.style.flexBasis = `calc(100% - ${lastLeft}px)`;
       } else {
@@ -234,7 +236,7 @@ export class PanelResizer {
 
       event.preventDefault();
 
-      if ($scope.property && $scope.property == 'left') {
+      if ($scope.property && $scope.property === 'left') {
         handleLeftEvent(event);
       } else {
         handleWidthEvent(event);

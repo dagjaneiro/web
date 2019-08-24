@@ -1,3 +1,5 @@
+import angular from 'angular';
+
 export function delayHide($timeout) {
   return {
     restrict: 'A',
@@ -6,8 +8,6 @@ export function delayHide($timeout) {
       delay: '@'
     },
     link: function(scope, elem, attrs) {
-      var showTimer;
-
       showElement(false);
 
       // This is where all the magic happens!

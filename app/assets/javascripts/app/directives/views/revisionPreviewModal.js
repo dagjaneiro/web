@@ -1,9 +1,12 @@
 import { SNComponent } from 'snjs';
+import { SFItem } from 'standard-file-js/lib/app/models/item';
+import { SFModelManager } from 'standard-file-js/lib/app/lib/modelManager';
+import template from '%/directives/revision-preview-modal.pug';
 
 export class RevisionPreviewModal {
   constructor() {
     this.restrict = 'E';
-    this.templateUrl = 'directives/revision-preview-modal.html';
+    this.template = template;
     this.scope = {
       uuid: '=',
       content: '='
@@ -48,12 +51,12 @@ export class RevisionPreviewModal {
         identifier: $scope.identifier,
         areas: ['editor-editor'],
         contextRequestHandler: component => {
-          if (component == $scope.editor) {
+          if (component === $scope.editor) {
             return $scope.note;
           }
         },
         componentForSessionKeyHandler: key => {
-          if (key == $scope.editor.sessionKey) {
+          if (key === $scope.editor.sessionKey) {
             return $scope.editor;
           }
         }

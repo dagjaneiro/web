@@ -1,4 +1,5 @@
 import { SNNote, SNSmartTag } from 'snjs';
+import template from '%/tags.pug';
 
 export function tagsSection() {
   return {
@@ -9,7 +10,7 @@ export function tagsSection() {
       save: '&',
       removeTag: '&'
     },
-    templateUrl: 'tags.html',
+    template: template,
     replace: true,
     controller: 'TagsCtrl',
     controllerAs: 'ctrl',
@@ -33,9 +34,9 @@ export function tagsCtrl(
 
   syncManager.addEventHandler((syncEvent, data) => {
     if (
-      syncEvent == 'local-data-loaded' ||
-      syncEvent == 'sync:completed' ||
-      syncEvent == 'local-data-incremental-load'
+      syncEvent === 'local-data-loaded' ||
+      syncEvent === 'sync:completed' ||
+      syncEvent === 'local-data-incremental-load'
     ) {
       this.tags = modelManager.tags;
       this.smartTags = modelManager.getSmartTags();
@@ -110,12 +111,12 @@ export function tagsCtrl(
     },
     actionHandler: function(component, action, data) {
       if (action === 'select-item') {
-        if (data.item.content_type == 'Tag') {
+        if (data.item.content_type === 'Tag') {
           const tag = modelManager.findItem(data.item.uuid);
           if (tag) {
             this.selectTag(tag);
           }
-        } else if (data.item.content_type == 'SN|SmartTag') {
+        } else if (data.item.content_type === 'SN|SmartTag') {
           const smartTag = new SNSmartTag(data.item);
           this.selectTag(smartTag);
         }
@@ -161,7 +162,7 @@ export function tagsCtrl(
     this.editingTag = null;
     $event.target.blur();
 
-    if (!tag.title || tag.title.length == 0) {
+    if (!tag.title || tag.title.length === 0) {
       if (originalTagName) {
         tag.title = originalTagName;
         originalTagName = null;

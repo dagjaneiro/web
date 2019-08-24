@@ -1,7 +1,9 @@
+import template from '%/directives/sync-resolution-menu.pug';
+
 export class SyncResolutionMenu {
   constructor() {
     this.restrict = 'E';
-    this.templateUrl = 'directives/sync-resolution-menu.html';
+    this.template = template;
     this.scope = {
       closeFunction: '&'
     };

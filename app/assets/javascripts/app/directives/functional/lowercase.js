@@ -3,7 +3,7 @@ export function lowercase() {
     require: 'ngModel',
     link: function(scope, element, attrs, modelCtrl) {
       var lowercase = function(inputValue) {
-        if (inputValue == undefined) inputValue = '';
+        if (inputValue === undefined) inputValue = '';
         var lowercased = inputValue.toLowerCase();
         if (lowercased !== inputValue) {
           modelCtrl.$setViewValue(lowercased);

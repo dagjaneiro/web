@@ -1,5 +1,9 @@
 import _ from 'lodash';
-import { KeyboardManager } from '../services/keyboardManager';
+import angular from 'angular';
+import { SFAuthManager } from 'standard-file-js/lib/app/lib/authManager';
+import { PrivilegesManager } from '@/services/privilegesManager';
+import { KeyboardManager } from '@/services/keyboardManager';
+import template from '%/notes.pug';
 
 export function notesSection() {
   return {
@@ -9,7 +13,7 @@ export function notesSection() {
       tag: '='
     },
 
-    templateUrl: 'notes.html',
+    template: template,
     replace: true,
     controller: 'NotesCtrl',
     controllerAs: 'ctrl',
@@ -45,7 +49,7 @@ export function notesCtrl(
   });
 
   authManager.addEventHandler(event => {
-    if (event == SFAuthManager.DidSignInEvent) {
+    if (event === SFAuthManager.DidSignInEvent) {
       // Delete dummy note if applicable
       if (this.selectedNote && this.selectedNote.dummy) {
         modelManager.removeItemLocally(this.selectedNote);
@@ -61,21 +65,9 @@ export function notesCtrl(
   });
 
   syncManager.addEventHandler((syncEvent, data) => {
-    if (syncEvent == 'local-data-loaded') {
-      if (this.notes.length == 0) {
-        this.createNewNote();
-      }
-    } else if (syncEvent == 'sync:completed') {
-      // Pad with a timeout just to be extra patient
-      $timeout(() => {
-        if (
-          this.createDummyOnSynCompletionIfNoNotes &&
-          this.notes.length == 0
-        ) {
-          this.createDummyOnSynCompletionIfNoNotes = false;
-          this.createNewNote();
-        }
-      }, 100);
+    if (syncEvent === 'local-data-loaded') {
+      this.localDataLoaded = true;
+      this.needsHandleDataLoad = true;
     }
   });
 
@@ -86,8 +78,15 @@ export function notesCtrl(
       // reload our notes
       this.reloadNotes();
 
+      if (this.needsHandleDataLoad) {
+        this.needsHandleDataLoad = false;
+        if (this.tag && this.notes.length === 0) {
+          this.createNewNote();
+        }
+      }
+
       // Note has changed values, reset its flags
-      const notes = allItems.filter(item => item.content_type == 'Note');
+      const notes = allItems.filter(item => item.content_type === 'Note');
       for (const note of notes) {
         this.loadFlagsForNote(note);
         note.cachedCreatedAtString = note.createdAtString();
@@ -139,12 +138,12 @@ export function notesCtrl(
     this.sortBy = authManager.getUserPrefValue('sortBy', 'created_at');
     this.sortReverse = authManager.getUserPrefValue('sortReverse', false);
 
-    if (this.sortBy == 'updated_at') {
+    if (this.sortBy === 'updated_at') {
       // use client_updated_at instead
       this.sortBy = 'client_updated_at';
     }
 
-    if (prevSortValue && prevSortValue != this.sortBy) {
+    if (prevSortValue && prevSortValue !== this.sortBy) {
       $timeout(() => {
         this.selectFirstNote();
       });
@@ -266,11 +265,11 @@ export function notesCtrl(
 
   this.optionsSubtitle = function() {
     var base = '';
-    if (this.sortBy == 'created_at') {
+    if (this.sortBy === 'created_at') {
       base += ' Date Added';
-    } else if (this.sortBy == 'client_updated_at') {
+    } else if (this.sortBy === 'client_updated_at') {
       base += ' Date Modified';
-    } else if (this.sortBy == 'title') {
+    } else if (this.sortBy === 'title') {
       base += ' Title';
     }
 
@@ -435,7 +434,7 @@ export function notesCtrl(
         let dummyNote;
         if (
           this.selectedNote &&
-          this.selectedNote != note &&
+          this.selectedNote !== note &&
           this.selectedNote.dummy
         ) {
           // remove dummy
@@ -614,7 +613,7 @@ export function notesCtrl(
       }
 
       var filterText = this.noteFilter.text.toLowerCase();
-      if (filterText.length == 0) {
+      if (filterText.length === 0) {
         note.visible = true;
       } else {
         var words = filterText.split(' ');
@@ -670,15 +669,15 @@ export function notesCtrl(
         vector *= -1;
       }
 
-      if (sortBy == 'title') {
+      if (sortBy === 'title') {
         aValue = aValue.toLowerCase();
         bValue = bValue.toLowerCase();
 
-        if (aValue.length == 0 && bValue.length == 0) {
+        if (aValue.length === 0 && bValue.length === 0) {
           return 0;
-        } else if (aValue.length == 0 && bValue.length != 0) {
+        } else if (aValue.length === 0 && bValue.length !== 0) {
           return 1 * vector;
-        } else if (aValue.length != 0 && bValue.length == 0) {
+        } else if (aValue.length !== 0 && bValue.length === 0) {
           return -1 * vector;
         } else {
           vector *= -1;
@@ -729,7 +728,7 @@ export function notesCtrl(
     elements: [document.body, this.getSearchBar()],
     onKeyDown: event => {
       const searchBar = this.getSearchBar();
-      if (searchBar == document.activeElement) {
+      if (searchBar === document.activeElement) {
         searchBar.blur();
       }
       $timeout(() => {

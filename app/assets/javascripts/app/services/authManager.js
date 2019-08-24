@@ -1,4 +1,8 @@
+import angular from 'angular';
 import { StorageManager } from './storageManager';
+import { SFItem } from 'standard-file-js/lib/app/models/item';
+import { SFPredicate } from 'standard-file-js/lib/app/models/predicate';
+import { SFAuthManager } from 'standard-file-js/lib/app/lib/authManager';
 
 export class AuthManager extends SFAuthManager {
   constructor(
@@ -49,7 +53,7 @@ export class AuthManager extends SFAuthManager {
   }
 
   isEphemeralSession() {
-    if (this.ephemeral == null || this.ephemeral == undefined) {
+    if (this.ephemeral === null || this.ephemeral === undefined) {
       this.ephemeral = JSON.parse(
         this.storageManager.getItemSync('ephemeral', StorageManager.Fixed)
       );
@@ -99,9 +103,9 @@ export class AuthManager extends SFAuthManager {
     });
   }
 
-  async changePassword(url, email, current_server_pw, newKeys, newAuthParams) {
+  async changePassword(url, email, currentServerPw, newKeys, newAuthParams) {
     return super
-      .changePassword(url, email, current_server_pw, newKeys, newAuthParams)
+      .changePassword(url, email, currentServerPw, newKeys, newAuthParams)
       .then(response => {
         if (!response.error) {
           this.checkForSecurityUpdate();

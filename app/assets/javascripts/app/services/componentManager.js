@@ -1,5 +1,7 @@
-import { isDesktopApplication, getPlatformString } from '../utils';
+import angular from 'angular';
 import { SNComponentManager } from 'snjs';
+import { isDesktopApplication, getPlatformString } from '@/utils';
+import { SFAlertManager } from 'standard-file-js/lib/app/lib/alertManager';
 
 export class ComponentManager extends SNComponentManager {
   constructor(

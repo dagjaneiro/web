@@ -1,7 +1,9 @@
+import template from '%/directives/actions-menu.pug';
+
 export class ActionsMenu {
   constructor() {
     this.restrict = 'E';
-    this.templateUrl = 'directives/actions-menu.html';
+    this.template = template;
     this.scope = {
       item: '='
     };
@@ -24,7 +26,7 @@ export class ActionsMenu {
     }
 
     $scope.executeAction = function(action, extension, parentAction) {
-      if (action.verb == 'nested') {
+      if (action.verb === 'nested') {
         if (!action.subrows) {
           action.subrows = $scope.subRowsForAction(action, extension);
         } else {
