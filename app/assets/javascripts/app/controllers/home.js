@@ -26,12 +26,6 @@ export function homeCtrl(
   privilegesManager,
   statusManager
 ) {
-  $scope.template = template;
-  // Lock syncing until local data is loaded. Syncing may be called from a variety of places,
-  // such as when the window focuses, for example. We don't want sync to occur until all local items are loaded,
-  // otherwise, if sync happens first, then load, the load may override synced values.
-  syncManager.lockSyncing();
-
   storageManager.initialize(
     passcodeManager.hasPasscode(),
     authManager.isEphemeralSession()
@@ -225,23 +219,23 @@ export function homeCtrl(
     */
 
   $scope.updateTagsForNote = function(note, stringTags) {
-    var toRemove = [];
-    for (var tag of note.tags) {
+    const toRemove = [];
+    for (const tag of note.tags) {
       if (stringTags.indexOf(tag.title) === -1) {
         // remove this tag
         toRemove.push(tag);
       }
     }
 
-    for (var tagToRemove of toRemove) {
+    for (const tagToRemove of toRemove) {
       tagToRemove.removeItemAsRelationship(note);
     }
 
     modelManager.setItemsDirty(toRemove, true);
 
-    var tags = [];
-    for (var tagString of stringTags) {
-      var existingRelationship = _.find(note.tags, { title: tagString });
+    const tags = [];
+    for (const tagString of stringTags) {
+      const existingRelationship = _.find(note.tags, { title: tagString });
       if (!existingRelationship) {
         tags.push(modelManager.findOrCreateTagByTitle(tagString));
       }
@@ -327,7 +321,7 @@ export function homeCtrl(
     */
 
   $rootScope.safeApply = function(fn) {
-    var phase = this.$root.$$phase;
+    const phase = this.$root.$$phase;
     if (phase === '$apply' || phase === '$digest') this.$eval(fn);
     else this.$apply(fn);
   };
@@ -399,9 +393,9 @@ export function homeCtrl(
   }
 
   async function autoSignInFromParams() {
-    var server = urlParam('server');
-    var email = urlParam('email');
-    var pw = urlParam('pw');
+    const server = urlParam('server');
+    const email = urlParam('email');
+    const pw = urlParam('pw');
 
     if (!authManager.offline()) {
       // check if current account
