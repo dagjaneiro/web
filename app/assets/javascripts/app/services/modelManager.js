@@ -10,7 +10,6 @@ import {
   SNServerExtension,
   SNMfa
 } from 'snjs';
-// import { SFItem } from 'standard-file-js/lib/app/models/item';
 import { SFModelManager } from 'standard-file-js/lib/app/lib/modelManager';
 import { SFPrivileges } from 'standard-file-js/lib/app/models/privileges/privileges';
 import { SFPredicate } from 'standard-file-js/lib/app/models/predicate';
@@ -28,6 +27,7 @@ SFModelManager.ContentTypeClassMapping = {
   'SN|Privileges': SFPrivileges
 };
 
+// FIXME: this needs to be fixed on SFJS side in order to avoid the global variable
 window.SFItem.AppDomain = 'org.standardnotes.sn';
 
 export class ModelManager extends SFModelManager {
