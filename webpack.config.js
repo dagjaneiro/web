@@ -48,6 +48,7 @@ module.exports = {
           {
             loader: MiniCssExtractPlugin.loader,
             options: {
+              publicPath: '../', // The base assets directory in relation to the stylesheets
               hmr: process.env.NODE_ENV === 'development'
             }
           },
