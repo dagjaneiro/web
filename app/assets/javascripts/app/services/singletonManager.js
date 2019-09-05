@@ -1,4 +1,4 @@
-import { SFSingletonManager } from 'standard-file-js/lib/app/lib/singletonManager';
+import { SFSingletonManager } from 'standard-file-js';
 
 export class SingletonManager extends SFSingletonManager {
   // constructor needed for angularjs injection to work

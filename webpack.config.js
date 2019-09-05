@@ -34,14 +34,14 @@ module.exports = {
         }
       },
       // Transpile only our libs since we import ES6 classes
-      {
-        test: /\.js$/,
-        include: /node_modules\/(standard-file-js|snjs)/,
-        loader: 'babel-loader',
-        options: {
-          presets: ['@babel/preset-env']
-        }
-      },
+      // {
+      //   test: /\.js$/,
+      //   include: /node_modules\/(standard-file-js|snjs)/,
+      //   loader: 'babel-loader',
+      //   options: {
+      //     presets: ['@babel/preset-env']
+      //   }
+      // },
       {
         test: /\.s?css$/,
         use: [

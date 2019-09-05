@@ -1,7 +1,6 @@
 import _ from 'lodash';
 import angular from 'angular';
-import { SFModelManager } from 'standard-file-js/lib/app/lib/modelManager';
-import { SFItemParams } from 'standard-file-js/lib/app/models/itemParams';
+import { SFModelManager, SFItemParams } from 'standard-file-js';
 import { Action } from 'snjs';
 
 export class ActionsManager {

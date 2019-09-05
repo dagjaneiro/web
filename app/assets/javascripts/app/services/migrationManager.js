@@ -1,5 +1,5 @@
 import { isDesktopApplication } from '@/utils';
-import { SFMigrationManager } from 'standard-file-js/lib/app/lib/migrationManager';
+import { SFMigrationManager } from 'standard-file-js';
 import { ComponentManager } from '@/services/componentManager';
 
 export class MigrationManager extends SFMigrationManager {

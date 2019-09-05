@@ -1,8 +1,7 @@
 // An interface used by the Desktop app to interact with SN
 import _ from 'lodash';
 import { isDesktopApplication } from '@/utils';
-import { SFItemParams } from 'standard-file-js/lib/app/models/itemParams';
-import { SFModelManager } from 'standard-file-js/lib/app/lib/modelManager';
+import { SFItemParams, SFModelManager } from 'standard-file-js';
 
 export class DesktopManager {
   constructor(

@@ -1,4 +1,4 @@
-import { SFHttpManager } from 'standard-file-js/lib/app/lib/httpManager';
+import { SFHttpManager } from 'standard-file-js';
 
 export class HttpManager extends SFHttpManager {
   constructor(storageManager, $timeout) {

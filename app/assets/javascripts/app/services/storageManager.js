@@ -1,6 +1,6 @@
 import { SNEncryptedStorage } from 'snjs';
-import { SFStorageManager } from 'standard-file-js/lib/app/lib/storageManager';
-import { SFItemParams } from 'standard-file-js/lib/app/models/itemParams';
+import { SFStorageManager , SFItemParams } from 'standard-file-js';
+
 
 export class MemoryStorage {
   constructor() {

@@ -1,8 +1,6 @@
 import angular from 'angular';
 import { StorageManager } from './storageManager';
-import { SFItem } from 'standard-file-js/lib/app/models/item';
-import { SFPredicate } from 'standard-file-js/lib/app/models/predicate';
-import { SFAuthManager } from 'standard-file-js/lib/app/lib/authManager';
+import { SFJS, SFItem, SFPredicate, SFAuthManager } from 'standard-file-js';
 
 export class AuthManager extends SFAuthManager {
   constructor(

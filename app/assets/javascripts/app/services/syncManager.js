@@ -1,5 +1,5 @@
 import angular from 'angular';
-import { SFSyncManager } from 'standard-file-js/lib/app/lib/syncManager';
+import { SFSyncManager } from 'standard-file-js';
 
 export class SyncManager extends SFSyncManager {
   constructor(

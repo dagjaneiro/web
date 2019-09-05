@@ -1,6 +1,6 @@
 /* A class for handling installation of system extensions */
 import { isDesktopApplication } from '@/utils';
-import { SFPredicate } from 'standard-file-js/lib/app/models/predicate';
+import { SFPredicate } from 'standard-file-js';
 
 export class NativeExtManager {
   constructor(modelManager, syncManager, singletonManager) {

@@ -1,4 +1,4 @@
-import { SFItemHistoryEntry } from 'standard-file-js/lib/app/models/session_history/itemHistoryEntry';
+import { SFItemHistoryEntry } from 'standard-file-js';
 
 export class NoteHistoryEntry extends SFItemHistoryEntry {
   previewTitle() {

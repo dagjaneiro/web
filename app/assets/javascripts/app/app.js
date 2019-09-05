@@ -2,6 +2,7 @@
 
 import angular from 'angular';
 import { configRoutes } from './routes';
+
 import {
   editorSection,
   editorCtrl,
@@ -72,14 +73,6 @@ import {
 } from './services';
 
 console.log('Starting SN modular build.');
-
-// FIXME: Remove this after modularizing SFJS
-// We need to instantiate the global SFModelManager once as it declares the
-// global mapping sources (ex: SFModelManager.MappingSourceRemoteRetrieved)
-// in the constructor and SFSingletonManager (among others) relies on those to
-// prevent an infinite recursion.
-// eslint-disable-next-line
-new window.SFModelManager();
 
 angular.module('app', ['ngSanitize']);
 

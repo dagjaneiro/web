@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import angular from 'angular';
-import { SFAuthManager } from 'standard-file-js/lib/app/lib/authManager';
+import { SFAuthManager } from 'standard-file-js';
 import { PrivilegesManager } from '@/services/privilegesManager';
 import { KeyboardManager } from '@/services/keyboardManager';
 import template from '%/notes.pug';

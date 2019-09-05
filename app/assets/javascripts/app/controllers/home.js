@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import { SFAuthManager } from 'standard-file-js/lib/app/lib/authManager';
+import { SFAuthManager } from 'standard-file-js';
 import { getPlatformString } from '@/utils';
 import template from '%/home.pug';
 
@@ -71,9 +71,7 @@ export function homeCtrl(
 
     this.syncStatusObserver = syncManager.registerSyncStatusObserver(status => {
       if (status.retrievedCount > 20) {
-        const text = `Downloading ${
-          status.retrievedCount
-        } items. Keep app open.`;
+        const text = `Downloading ${status.retrievedCount} items. Keep app open.`;
         this.syncStatus = statusManager.replaceStatusWithString(
           this.syncStatus,
           text

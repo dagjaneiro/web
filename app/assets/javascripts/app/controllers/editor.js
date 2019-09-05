@@ -1,5 +1,5 @@
 import angular from 'angular';
-import { SFModelManager } from 'standard-file-js/lib/app/lib/modelManager';
+import { SFModelManager } from 'standard-file-js';
 import { isDesktopApplication } from '@/utils';
 import { KeyboardManager } from '@/services/keyboardManager';
 import { PrivilegesManager } from '@/services/privilegesManager';

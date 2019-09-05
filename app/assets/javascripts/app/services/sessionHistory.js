@@ -1,6 +1,6 @@
 import { NoteHistoryEntry } from '@/models/noteHistoryEntry';
-import { SFSessionHistoryManager } from 'standard-file-js/lib/app/lib/session_history/sessionHistoryManager';
-import { SFItemHistory } from 'standard-file-js/lib/app/models/session_history/itemHistory';
+import { SFSessionHistoryManager , SFItemHistory } from 'standard-file-js';
+
 
 export class SessionHistory extends SFSessionHistoryManager {
   constructor(
